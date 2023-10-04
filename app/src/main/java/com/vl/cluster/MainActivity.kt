@@ -2,11 +2,9 @@ package com.vl.cluster
 
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
-import androidx.core.os.bundleOf
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,7 +15,7 @@ import com.vl.cluster.screen.WelcomeSliderScreen
 import com.vl.cluster.screen.authorizationNavigation
 import com.vl.cluster.ui.theme.AppTheme
 
-class SingleAppActivity: ComponentActivity() {
+class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
