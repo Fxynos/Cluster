@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Cluster"
 include(":app")
+include(":api")
