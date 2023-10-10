@@ -1,3 +1,3 @@
 package com.vl.cluster.api.definition
 
-interface NetworkNewsfeed
+interface NetworkNewsfeed // TODO define
