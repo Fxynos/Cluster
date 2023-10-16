@@ -9,6 +9,10 @@ public class VkExampleTest {
 
     @Test
     public void testAuthWithIncorrectCredentials() {
-        assertNull(network.signIn("890000000000", "password"));
+         assertNull(network.signIn("890000000000", "password"));
+    }
+    @Test
+    public void testNewsFeedIsWorking(){
+        assertNull(network.getNewsFeed());
     }
 }
