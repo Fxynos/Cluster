@@ -41,6 +41,6 @@ public class VkNetwork implements Network {
 
     @Override
     public int getId() {
-        return Network.super.getId();
+        return Network.DefaultImpls.getId(this);
     }
 }
