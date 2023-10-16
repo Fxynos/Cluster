@@ -46,7 +46,7 @@ public class VkNetwork implements Network {
 
     @Override
     public int getId() {
-        return Network.super.getId();
+        return Network.DefaultImpls.getId(this);
     }
 
     public com.vk.api.sdk.objects.newsfeed.responses.GetResponse getNewsFeed() {
