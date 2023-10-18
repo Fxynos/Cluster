@@ -1,51 +1,38 @@
 package com.vl.cluster.api.network.vk;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Auth {
     @SerializedName("access_token")
-    String accessToken;
+    private String accessToken;
     @SerializedName("user_id")
-    Integer userID;
+    private int userId;
     @SerializedName("expires_in")
-    Integer expiresIn;
+    private int expiresIn;
 
-    public Auth(String accessToken, Integer userID, Integer expiresIn){
+    public Auth(String accessToken, int userId, int expiresIn) {
         this.accessToken = accessToken;
+        this.userId = userId;
         this.expiresIn = expiresIn;
-        this.userID = userID;
-    }
-
-    public Integer getExpiresIn() {
-        return expiresIn;
     }
 
     public String getAccessToken() {
         return accessToken;
     }
 
-    public Integer getUserID() {
-        return userID;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public void setUserID(Integer userID) {
-        this.userID = userID;
-    }
-
-    public void setExpiresIn(Integer expiresIn) {
-        this.expiresIn = expiresIn;
+    public int getExpiresIn() {
+        return expiresIn;
     }
 
     @Override
     public String toString() {
         return "Auth{" +
                 "access_token='" + accessToken + '\'' +
-                ", user_id='" + userID + '\'' +
+                ", user_id='" + userId + '\'' +
                 ", expires_in='" + expiresIn + '\'' +
                 '}';
     }

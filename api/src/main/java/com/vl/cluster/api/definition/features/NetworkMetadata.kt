@@ -1,4 +1,4 @@
-package com.vl.cluster.api.definition
+package com.vl.cluster.api.definition.features
 
 interface NetworkMetadata {
     val name: String

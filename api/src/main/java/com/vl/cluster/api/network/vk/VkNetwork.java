@@ -1,26 +1,34 @@
 package com.vl.cluster.api.network.vk;
 
 import com.vk.api.sdk.client.VkApiClient;
-import com.vk.api.sdk.client.actors.UserActor;
-import com.vk.api.sdk.exceptions.ApiException;
-import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
-import com.vk.api.sdk.objects.newsfeed.responses.GetResponse;
 import com.vl.cluster.api.ApiCredentialsKt;
+import com.vl.cluster.api.HttpClient;
+import com.vl.cluster.api.definition.ConnectionException;
 import com.vl.cluster.api.definition.Network;
+import com.vl.cluster.api.definition.Session;
+import com.vl.cluster.api.definition.features.NetworkAuth;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Set;
 
 import retrofit2.Response;
 
 
-public class VkNetwork implements Network {
+public class VkNetwork implements
+        Network<VkNetwork.VkSession>,
+        NetworkAuth.Password<VkNetwork.VkSession> {
     private static final String NAME = "ВКонтакте";
-    private final VkApiClient vk = new VkApiClient(new HttpTransportClient());
+    private final HttpClient authClient = new HttpClient("https://oauth.vk.com");
+
+    @NotNull
+    @Override
+    public VkNetwork getAuthentication() {
+        return this;
+    }
 
     @NotNull
     @Override
@@ -30,22 +38,24 @@ public class VkNetwork implements Network {
 
     @NotNull
     @Override
-    public AuthType getAuthType() {
-        return AuthType.PASSWORD;
-    }
-
-    @Nullable
-    @Override
-    public String signIn(@NotNull String login, @NotNull String password) {
-        AuthService service = AuthService.getInstance();
-        AuthVK serviceApi = service.getAccessToken();
+    public VkSession signIn(@NotNull String login, @NotNull String password)
+            throws WrongCredentialsException, ConnectionException {
+        Response<Auth> auth;
         try {
-            Response<Auth> auth = serviceApi.getAccessToken(ApiCredentialsKt.CLIENT_ID_VK, ApiCredentialsKt.CLIENT_SECRET_VK, "password", login, password).execute();
-            return (auth.isSuccessful()) ? auth.body().accessToken : null;
-        } catch (IOException e) {
-            e.printStackTrace();
+            auth = authClient.getApi(AuthHttpApi.class).signIn(
+                    Integer.parseInt(ApiCredentialsKt.CLIENT_ID_VK),
+                    ApiCredentialsKt.CLIENT_SECRET_VK,
+                    login,
+                    password
+            ).execute();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            throw new ConnectionException();
         }
-        return null; // TODO implement
+        if (!auth.isSuccessful())
+            throw new ConnectionException();
+        Auth response = Objects.requireNonNull(auth.body());
+        return new VkSession(response.getUserId(), response.getAccessToken());
     }
 
     @NotNull
@@ -59,14 +69,15 @@ public class VkNetwork implements Network {
         return Network.DefaultImpls.getId(this);
     }
 
-    public com.vk.api.sdk.objects.newsfeed.responses.GetResponse getNewsFeed() {
-        UserActor actor = new UserActor(ApiCredentialsKt.USER_ID, ApiCredentialsKt.ACCESS_TOKEN);
-        GetResponse getResponse;
-        try {
-            getResponse = vk.newsfeed().get(actor).execute();
-        } catch (ApiException | ClientException e) {
-            throw new RuntimeException(e);
+    public class VkSession extends Session {
+        private final int userId;
+        private final String token;
+        private final VkApiClient client = new VkApiClient(new HttpTransportClient());
+
+        private VkSession(int userId, String token) {
+            super(VkNetwork.this);
+            this.userId = userId;
+            this.token = token;
         }
-        return getResponse;
     }
 }
