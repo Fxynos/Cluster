@@ -1,6 +1,9 @@
 package com.vl.cluster.api.network.vk;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import com.vl.cluster.api.ApiCredentialsKt;
 
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +12,7 @@ public class VkExampleTest {
 
     @Test
     public void testAuthWithIncorrectCredentials() {
-         assertNull(network.signIn("890000000000", "password"));
+         assertNull(network.signIn("login", "password"));
     }
     @Test
     public void testNewsFeedIsWorking(){

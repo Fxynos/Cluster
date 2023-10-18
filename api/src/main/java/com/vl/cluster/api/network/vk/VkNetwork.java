@@ -6,14 +6,16 @@ import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vk.api.sdk.objects.newsfeed.responses.GetResponse;
-import com.vk.api.sdk.objects.wall.GetFilter;
 import com.vl.cluster.api.ApiCredentialsKt;
 import com.vl.cluster.api.definition.Network;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.Set;
+
+import retrofit2.Response;
 
 
 public class VkNetwork implements Network {
@@ -35,6 +37,14 @@ public class VkNetwork implements Network {
     @Nullable
     @Override
     public String signIn(@NotNull String login, @NotNull String password) {
+        AuthService service = AuthService.getInstance();
+        AuthVK serviceApi = service.getAccessToken();
+        try {
+            Response<Auth> auth = serviceApi.getAccessToken(ApiCredentialsKt.CLIENT_ID_VK, ApiCredentialsKt.CLIENT_SECRET_VK, "password", login, password).execute();
+            return (auth.isSuccessful()) ? auth.body().accessToken : null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return null; // TODO implement
     }
 
@@ -51,12 +61,10 @@ public class VkNetwork implements Network {
 
     public com.vk.api.sdk.objects.newsfeed.responses.GetResponse getNewsFeed() {
         UserActor actor = new UserActor(ApiCredentialsKt.USER_ID, ApiCredentialsKt.ACCESS_TOKEN);
-        GetResponse getResponse = null;
+        GetResponse getResponse;
         try {
             getResponse = vk.newsfeed().get(actor).execute();
-        } catch (ApiException e) {
-            throw new RuntimeException(e);
-        } catch (ClientException e) {
+        } catch (ApiException | ClientException e) {
             throw new RuntimeException(e);
         }
         return getResponse;
