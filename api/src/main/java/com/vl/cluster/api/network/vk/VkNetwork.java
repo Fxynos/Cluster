@@ -60,13 +60,13 @@ public class VkNetwork implements
 
     @NotNull
     @Override
-    public String getName() {
+    public String getNetworkName() {
         return NAME;
     }
 
     @Override
-    public int getId() {
-        return Network.DefaultImpls.getId(this);
+    public int getNetworkId() {
+        return Network.DefaultImpls.getNetworkId(this);
     }
 
     public class VkSession extends Session {
@@ -78,6 +78,17 @@ public class VkNetwork implements
             super(VkNetwork.this);
             this.userId = userId;
             this.token = token;
+        }
+
+        @Override
+        public int getSessionId() {
+            return userId;
+        }
+
+        @NotNull
+        @Override
+        public String getSessionName() {
+            return "unknown"; // TODO implement
         }
     }
 }
