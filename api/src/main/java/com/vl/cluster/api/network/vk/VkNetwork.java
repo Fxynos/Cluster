@@ -1,5 +1,6 @@
 package com.vl.cluster.api.network.vk;
 
+import com.google.gson.Gson;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vl.cluster.api.ApiCredentialsKt;
@@ -36,10 +37,35 @@ public class VkNetwork implements
         return Set.of(LoginType.PHONE);
     }
 
+    public static class Fa2Exception extends Exception {
+        String type2Fa;
+        String phoneMask;
+
+
+        public Fa2Exception(String type2Fa, String phoneMask) {
+            this.type2Fa = type2Fa;
+            this.phoneMask = phoneMask;
+        }
+    }
+
+    public static class NeedCaptchaException extends Exception {
+            String captchaSid;
+            String captchaImg;
+
+        public NeedCaptchaException(String captchaSid, String captchaImg) {
+            this.captchaSid = captchaSid;
+            this.captchaImg = captchaImg;
+        }
+    }
+
+    public static class NeedFa2CallReset extends Exception {
+
+    }
+
     @NotNull
     @Override
     public VkSession signIn(@NotNull String login, @NotNull String password)
-            throws WrongCredentialsException, ConnectionException {
+            throws WrongCredentialsException, ConnectionException, Fa2Exception, NeedCaptchaException, NeedFa2CallReset {
         Response<Auth> auth;
         try {
             auth = authClient.getApi(AuthHttpApi.class).signIn(
@@ -52,11 +78,73 @@ public class VkNetwork implements
             exception.printStackTrace();
             throw new ConnectionException();
         }
-        if (!auth.isSuccessful())
-            throw new ConnectionException();
+        checkAuthErrors(auth);
         Auth response = Objects.requireNonNull(auth.body());
         return new VkSession(response.getUserId(), response.getAccessToken());
     }
+
+    private void checkAuthErrors(@NotNull Response<Auth> auth) throws WrongCredentialsException, Fa2Exception, NeedCaptchaException, NeedFa2CallReset{
+        ErrorResponse error;
+        Gson gson = new Gson();
+        if (!auth.isSuccessful()) {
+            error = gson.fromJson(auth.errorBody().charStream(), ErrorResponse.class);
+            if (error.getError().equals("invalid_client")) {
+                throw new WrongCredentialsException();
+            }
+            if (error.getError().equals("need_validation")) {
+                if (error.getValidationType().equals("2fa_callreset")) {
+                    throw new NeedFa2CallReset();
+                } else {
+                    System.out.println(error.getValidationType());
+                    throw new Fa2Exception(error.getValidationType(), error.getPhoneMask());
+                }
+            }
+            if (error.getError().equals("need_captcha")) {
+                throw new NeedCaptchaException(error.getCaptchaSid(), error.getCaptchaImg());
+            }
+        }
+    }
+
+    public VkSession signInWithCaptcha(@NotNull String login, @NotNull String password, @NotNull String captchaKey, @NotNull String captchaSid) throws ConnectionException, WrongCredentialsException, NeedCaptchaException, Fa2Exception, NeedFa2CallReset {
+        Response<Auth> auth;
+        try {
+            auth = authClient.getApi(AuthHttpApi.class).SignInWithCaptcha(
+                    Integer.parseInt(ApiCredentialsKt.CLIENT_ID_VK),
+                    ApiCredentialsKt.CLIENT_SECRET_VK,
+                    login,
+                    password,
+                    captchaKey,
+                    captchaSid
+            ).execute();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            throw new ConnectionException();
+        }
+        checkAuthErrors(auth);
+        Auth response = Objects.requireNonNull(auth.body());
+        return new VkSession(response.getUserId(), response.getAccessToken());
+    }
+
+    public VkSession signInWithCode(@NotNull String login, @NotNull String password, @NotNull String code) throws ConnectionException, NeedCaptchaException, Fa2Exception, WrongCredentialsException, NeedFa2CallReset {
+        Response<Auth> auth;
+        try {
+            auth = authClient.getApi(AuthHttpApi.class).SignInWithCode(
+                    Integer.parseInt(ApiCredentialsKt.CLIENT_ID_VK),
+                    ApiCredentialsKt.CLIENT_SECRET_VK,
+                    login,
+                    password,
+                    code
+            ).execute();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            throw new ConnectionException();
+        }
+        checkAuthErrors(auth);
+        Auth response = Objects.requireNonNull(auth.body());
+        return new VkSession(response.getUserId(), response.getAccessToken());
+    }
+
+
 
     @NotNull
     @Override

@@ -15,4 +15,8 @@ public class VkExampleTest {
                  () -> network.signIn("login", "password")
          );
     }
+    @Test
+    public void testCaptcha() {
+        assertThrows(NetworkAuth.Password.WrongCredentialsException.class, () -> network.signInWithCaptcha("login", "password", "Captcha text", "Captcha Sid"));
+    }
 }
