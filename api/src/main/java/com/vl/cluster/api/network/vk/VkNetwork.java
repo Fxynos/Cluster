@@ -5,10 +5,15 @@ import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vl.cluster.api.ApiCredentialsKt;
 import com.vl.cluster.api.HttpClient;
-import com.vl.cluster.api.definition.ConnectionException;
+import com.vl.cluster.api.definition.exception.CaptchaException;
+import com.vl.cluster.api.definition.exception.ConnectionException;
 import com.vl.cluster.api.definition.Network;
 import com.vl.cluster.api.definition.Session;
+import com.vl.cluster.api.definition.exception.TwoFaException;
+import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException;
 import com.vl.cluster.api.definition.features.NetworkAuth;
+import com.vl.cluster.api.network.vk.dto.AuthErrorResponse;
+import com.vl.cluster.api.network.vk.dto.AuthSuccessResponse;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -16,12 +21,14 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 
+import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 
 public class VkNetwork implements
         Network<VkNetwork.VkSession>,
-        NetworkAuth.Password<VkNetwork.VkSession> {
+        NetworkAuth.Password<VkNetwork.VkSession>
+{
     private static final String NAME = "ВКонтакте";
     private final HttpClient authClient = new HttpClient("https://oauth.vk.com");
 
@@ -37,36 +44,16 @@ public class VkNetwork implements
         return Set.of(LoginType.PHONE);
     }
 
-    public static class Fa2Exception extends Exception {
-        String type2Fa;
-        String phoneMask;
-
-
-        public Fa2Exception(String type2Fa, String phoneMask) {
-            this.type2Fa = type2Fa;
-            this.phoneMask = phoneMask;
-        }
-    }
-
-    public static class NeedCaptchaException extends Exception {
-            String captchaSid;
-            String captchaImg;
-
-        public NeedCaptchaException(String captchaSid, String captchaImg) {
-            this.captchaSid = captchaSid;
-            this.captchaImg = captchaImg;
-        }
-    }
-
-    public static class NeedFa2CallReset extends Exception {
-
-    }
-
     @NotNull
     @Override
-    public VkSession signIn(@NotNull String login, @NotNull String password)
-            throws WrongCredentialsException, ConnectionException, Fa2Exception, NeedCaptchaException, NeedFa2CallReset {
-        Response<Auth> auth;
+    public VkSession signIn(@NotNull String login, @NotNull String password) throws
+            WrongCredentialsException,
+            ConnectionException,
+            TwoFaException,
+            CaptchaException,
+            UnsupportedLoginMethodException
+    {
+        Response<AuthSuccessResponse> auth;
         try {
             auth = authClient.getApi(AuthHttpApi.class).signIn(
                     Integer.parseInt(ApiCredentialsKt.CLIENT_ID_VK),
@@ -78,73 +65,82 @@ public class VkNetwork implements
             exception.printStackTrace();
             throw new ConnectionException();
         }
-        checkAuthErrors(auth);
-        Auth response = Objects.requireNonNull(auth.body());
-        return new VkSession(response.getUserId(), response.getAccessToken());
-    }
-
-    private void checkAuthErrors(@NotNull Response<Auth> auth) throws WrongCredentialsException, Fa2Exception, NeedCaptchaException, NeedFa2CallReset{
-        ErrorResponse error;
-        Gson gson = new Gson();
-        if (!auth.isSuccessful()) {
-            error = gson.fromJson(auth.errorBody().charStream(), ErrorResponse.class);
-            if (error.getError().equals("invalid_client")) {
-                throw new WrongCredentialsException();
-            }
-            if (error.getError().equals("need_validation")) {
-                if (error.getValidationType().equals("2fa_callreset")) {
-                    throw new NeedFa2CallReset();
-                } else {
-                    System.out.println(error.getValidationType());
-                    throw new Fa2Exception(error.getValidationType(), error.getPhoneMask());
+        /* Handling errors */
+        if (!auth.isSuccessful()) try (ResponseBody response = Objects.requireNonNull(auth.errorBody())) {
+            final AuthErrorResponse error = new Gson().fromJson(
+                    response.charStream(),
+                    AuthErrorResponse.class
+            );
+            switch (error.getErrorName()) {
+                case "invalid_client" -> throw new WrongCredentialsException();
+                case "need_captcha" -> throw new CaptchaException(
+                        error.getCaptchaSid(),
+                        error.getCaptchaImg(),
+                        captcha -> { // on captcha confirmation
+                            Response<AuthSuccessResponse> capAuth;
+                            try {
+                                capAuth = authClient.getApi(AuthHttpApi.class).signInWithCaptcha(
+                                        Integer.parseInt(ApiCredentialsKt.CLIENT_ID_VK),
+                                        ApiCredentialsKt.CLIENT_SECRET_VK,
+                                        login,
+                                        password,
+                                        captcha,
+                                        error.getCaptchaSid()
+                                ).execute();
+                            } catch (IOException exception) {
+                                exception.printStackTrace();
+                                throw new ConnectionException();
+                            }
+                            if (!capAuth.isSuccessful()) // TODO check if password or captcha are wrong
+                                throw new Exception();
+                            AuthSuccessResponse capResponse =
+                                    Objects.requireNonNull(capAuth.body());
+                            return new VkSession(capResponse.getUserId(), capResponse.getAccessToken());
+                        }
+                    );
+                case "need_validation" -> {
+                    switch (error.getValidationType()) {
+                        case "2fa_sms", "2fa_app" -> throw new TwoFaException(
+                                error.getValidationType().equals("2fa_sms") ?
+                                        TwoFaException.CodeSource.SMS :
+                                        TwoFaException.CodeSource.APP,
+                                code -> {
+                                    Response<AuthSuccessResponse> codeAuth;
+                                    try {
+                                        codeAuth = authClient.getApi(AuthHttpApi.class)
+                                            .signInWithCode(
+                                                Integer.parseInt(ApiCredentialsKt.CLIENT_ID_VK),
+                                                ApiCredentialsKt.CLIENT_SECRET_VK,
+                                                login,
+                                                password,
+                                                code
+                                            ).execute();
+                                    } catch (IOException exception) {
+                                        exception.printStackTrace();
+                                        throw new ConnectionException();
+                                    }
+                                    if (!codeAuth.isSuccessful())
+                                        throw new WrongCredentialsException();
+                                    AuthSuccessResponse codeResponse =
+                                            Objects.requireNonNull(codeAuth.body());
+                                    return new VkSession(
+                                            codeResponse.getUserId(),
+                                            codeResponse.getAccessToken()
+                                    );
+                                }
+                        );
+                        default -> throw new UnsupportedLoginMethodException(
+                                error.getValidationType()
+                        );
+                    }
                 }
-            }
-            if (error.getError().equals("need_captcha")) {
-                throw new NeedCaptchaException(error.getCaptchaSid(), error.getCaptchaImg());
+                default -> throw new RuntimeException(error.getErrorDescription());
             }
         }
-    }
-
-    public VkSession signInWithCaptcha(@NotNull String login, @NotNull String password, @NotNull String captchaKey, @NotNull String captchaSid) throws ConnectionException, WrongCredentialsException, NeedCaptchaException, Fa2Exception, NeedFa2CallReset {
-        Response<Auth> auth;
-        try {
-            auth = authClient.getApi(AuthHttpApi.class).SignInWithCaptcha(
-                    Integer.parseInt(ApiCredentialsKt.CLIENT_ID_VK),
-                    ApiCredentialsKt.CLIENT_SECRET_VK,
-                    login,
-                    password,
-                    captchaKey,
-                    captchaSid
-            ).execute();
-        } catch (IOException exception) {
-            exception.printStackTrace();
-            throw new ConnectionException();
-        }
-        checkAuthErrors(auth);
-        Auth response = Objects.requireNonNull(auth.body());
+        /* Success */
+        AuthSuccessResponse response = Objects.requireNonNull(auth.body());
         return new VkSession(response.getUserId(), response.getAccessToken());
     }
-
-    public VkSession signInWithCode(@NotNull String login, @NotNull String password, @NotNull String code) throws ConnectionException, NeedCaptchaException, Fa2Exception, WrongCredentialsException, NeedFa2CallReset {
-        Response<Auth> auth;
-        try {
-            auth = authClient.getApi(AuthHttpApi.class).SignInWithCode(
-                    Integer.parseInt(ApiCredentialsKt.CLIENT_ID_VK),
-                    ApiCredentialsKt.CLIENT_SECRET_VK,
-                    login,
-                    password,
-                    code
-            ).execute();
-        } catch (IOException exception) {
-            exception.printStackTrace();
-            throw new ConnectionException();
-        }
-        checkAuthErrors(auth);
-        Auth response = Objects.requireNonNull(auth.body());
-        return new VkSession(response.getUserId(), response.getAccessToken());
-    }
-
-
 
     @NotNull
     @Override

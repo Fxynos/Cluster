@@ -1,8 +1,8 @@
-package com.vl.cluster.api.network.vk;
+package com.vl.cluster.api.network.vk.dto;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Auth {
+public class AuthSuccessResponse {
     @SerializedName("access_token")
     private String accessToken;
     @SerializedName("user_id")
@@ -10,7 +10,7 @@ public class Auth {
     @SerializedName("expires_in")
     private int expiresIn;
 
-    public Auth(String accessToken, int userId, int expiresIn) {
+    public AuthSuccessResponse(String accessToken, int userId, int expiresIn) {
         this.accessToken = accessToken;
         this.userId = userId;
         this.expiresIn = expiresIn;

@@ -1,8 +1,11 @@
 package com.vl.cluster.api
 
-import com.vl.cluster.api.definition.ConnectionException
+import com.vl.cluster.api.definition.exception.ConnectionException
 import com.vl.cluster.api.definition.Network
 import com.vl.cluster.api.definition.Session
+import com.vl.cluster.api.definition.exception.CaptchaException
+import com.vl.cluster.api.definition.exception.TwoFaException
+import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException
 import com.vl.cluster.api.definition.features.NetworkAuth
 import java.util.stream.Stream
 
@@ -18,7 +21,13 @@ class NetworkReducer(val networks: Array<Network<out Session>>) {
     fun isPasswordAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.Password
     fun isSmsAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.Sms
     fun isCallAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.Call
-    @Throws(NetworkAuth.Password.WrongCredentialsException::class, ConnectionException::class)
+    @Throws(
+        NetworkAuth.Password.WrongCredentialsException::class,
+        ConnectionException::class,
+        TwoFaException::class,
+        CaptchaException::class,
+        UnsupportedLoginMethodException::class
+    )
     fun signInWithPassword(nId: Int, login: String, password: String): Session =
         (this.findNetById(nId).authentication as NetworkAuth.Password)
             .signIn(login, password)

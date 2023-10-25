@@ -1,10 +1,10 @@
-package com.vl.cluster.api.network.vk;
+package com.vl.cluster.api.network.vk.dto;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ErrorResponse {
+public class AuthErrorResponse {
     @SerializedName("error")
-    private String error;
+    private String errorName;
     @SerializedName("error_description")
     private String errorDescription;
     @SerializedName("validation_type")
@@ -19,8 +19,8 @@ public class ErrorResponse {
     @SerializedName("captcha_img")
     private String captchaImg;
 
-    public String getError() {
-        return error;
+    public String getErrorName() {
+        return errorName;
     }
 
     public String getErrorDescription() {
@@ -38,7 +38,7 @@ public class ErrorResponse {
     @Override
     public String toString() {
         return "ErrorResponse{" +
-                "error='" + error + '\'' +
+                "error='" + errorName + '\'' +
                 ", error_description='" + errorDescription + '\'' +
                 ", validation_type='" + validationType + '\'' +
                 '}';
