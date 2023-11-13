@@ -45,6 +45,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.compose.navigation
+import com.vl.cluster.GlobalState
+import com.vl.cluster.GlobalState.getIcon
 import com.vl.cluster.R
 import com.vl.cluster.logic.AuthViewModel
 import com.vl.cluster.ui.theme.AppTheme
@@ -63,10 +65,10 @@ fun NavGraphBuilder.authorizationNavigation(
             arguments = AuthRoute.LOGIN.args
         ) { backStack ->
             val model = viewModel<AuthViewModel>()
-            model.network = Network(
-                backStack.arguments!!.getString("networkName")!!,
-                backStack.arguments!!.getInt("networkIcon")
-            )
+            model.network = GlobalState.reducer
+                .findNetById(backStack.arguments!!.getInt("networkId")).let {
+                    Network(it.networkName, it.networkId, it.getIcon())
+                }
             LoginScreen(
                 viewModel = model,
                 onDone = { navController.navigate("password") }
@@ -90,7 +92,7 @@ fun LoginScreenPreview(@PreviewParameter(NetworkPreviewParameterProvider::class)
         Surface {
             LoginScreen(
                 viewModel = viewModel<AuthViewModel>()
-                    .also { it.network = Network("ВКонтакте", R.drawable.vk) },
+                    .also { it.network = network },
                 onDone = {}
             )
         }
@@ -198,18 +200,14 @@ fun AuthPanel(
 }
 
 class NetworkPreviewParameterProvider: PreviewParameterProvider<Network> {
-    override val values = sequenceOf(Network("ВКонтакте", R.drawable.vk))
+    override val values = sequenceOf(Network("ВКонтакте", 0, R.drawable.vk))
 }
 
 private enum class AuthRoute(val route: String, val args: List<NamedNavArgument>) {
     LOGIN(
-        "login?networkName={networkName}&networkIcon={networkIcon}",
+        "login?networkId={networkId}",
         listOf(
-            navArgument("networkName") {
-                nullable = false
-                type = NavType.StringType
-            },
-            navArgument("networkIcon") {
+            navArgument("networkId") {
                 nullable = false
                 type = NavType.IntType
             }

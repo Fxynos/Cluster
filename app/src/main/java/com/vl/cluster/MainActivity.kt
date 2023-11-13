@@ -1,6 +1,5 @@
 package com.vl.cluster
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +7,7 @@ import androidx.compose.material3.Surface
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.vl.cluster.GlobalState.getIcon
 import com.vl.cluster.screen.Network
 import com.vl.cluster.screen.NetworksScreen
 import com.vl.cluster.screen.WelcomeSliderPage
@@ -52,20 +52,18 @@ class MainActivity: ComponentActivity() {
                         }
                         composable("networks") {
                             NetworksScreen(
-                                listOf(
-                                    Network("ВКонтакте", R.drawable.vk),
-                                    Network("Telegram", R.drawable.telegram)
-                                ),
+                                listOf(*GlobalState.reducer.networks)
+                                    .map { Network(it.networkName, it.networkId, it.getIcon()) },
                                 onClick = { network ->
                                     navController.navigate(
-                                        "authorization?networkName=${Uri.encode(network.name)}&networkIcon=${network.icon}"
+                                        "authorization?networkId=${network.id}"
                                     )
                                 }
                             )
                         }
                         authorizationNavigation(
                             navController,
-                            "authorization?networkName={networkName}&networkIcon={networkIcon}"
+                            "authorization?networkId={networkId}"
                         )
                     }
                 }
