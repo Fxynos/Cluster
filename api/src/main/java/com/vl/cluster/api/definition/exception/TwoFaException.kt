@@ -12,6 +12,7 @@ class TwoFaException (
         APP
     }
 
+    @Throws(ConnectionException::class, WrongCredentialsException::class)
     fun signIn(code: String) = onCodeConfirmed.signIn(code)
 
     fun interface Confirmation {

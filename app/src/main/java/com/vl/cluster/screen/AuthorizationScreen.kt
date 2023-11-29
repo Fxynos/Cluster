@@ -1,7 +1,6 @@
 package com.vl.cluster.screen
 
-import android.net.Uri
-import android.widget.Toast
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,13 +24,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,84 +37,81 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.compose.navigation
+import com.vl.cluster.GlobalState
+import com.vl.cluster.GlobalState.getIcon
 import com.vl.cluster.R
+import com.vl.cluster.api.definition.exception.CaptchaException
+import com.vl.cluster.api.definition.exception.ConnectionException
+import com.vl.cluster.api.definition.exception.TwoFaException
+import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException
+import com.vl.cluster.api.definition.features.NetworkAuth
+import com.vl.cluster.logic.AuthViewModel
 import com.vl.cluster.ui.theme.AppTheme
 
+@SuppressLint("UnrememberedGetBackStackEntry")
 fun NavGraphBuilder.authorizationNavigation(
     navController: NavController,
     route: String
 ) = navigation(
         route = route,
-        startDestination = "login?networkName={networkName}&networkIcon={networkIcon}",
-        arguments = listOf(
-            navArgument("networkName") {
-                nullable = false
-                type = NavType.StringType
-            },
-            navArgument("networkIcon") {
-                nullable = false
-                type = NavType.IntType
-            }
-        )
+        startDestination = AuthRoute.LOGIN.route,
+        arguments = AuthRoute.LOGIN.args
     ) {
         composable(
-            route = "login?networkName={networkName}&networkIcon={networkIcon}",
-            arguments = listOf(
-                navArgument("networkName") {
-                    nullable = false
-                    type = NavType.StringType
-                },
-                navArgument("networkIcon") {
-                    nullable = false
-                    type = NavType.IntType
-                }
-            )
+            route = AuthRoute.LOGIN.route,
+            arguments = AuthRoute.LOGIN.args
         ) { backStack ->
-            val networkName = backStack.arguments!!.getString("networkName")!!
-            val networkIcon = backStack.arguments!!.getInt("networkIcon")
+            val model = viewModel<AuthViewModel>()
+            model.network = GlobalState.reducer
+                .findNetById(backStack.arguments!!.getInt("networkId")).let {
+                    Network(it.networkName, it.networkId, it.getIcon())
+                }
             LoginScreen(
-                network = Network(networkName, networkIcon),
-                onDone = { login ->
-                    navController.navigate(
-                        "password?networkName=${Uri.encode(networkName)}&" +
-                                "networkIcon=$networkIcon&" +
-                                "login=${Uri.encode(login)}"
-                    )
+                viewModel = model,
+                onDone = {
+                    try {
+                        model.attemptLogin()
+                        navController.navigate(AuthRoute.PASSWORD.route) // TODO choose relevant sign method
+                    } catch (e: AuthViewModel.MalformedInputException) {
+                        println("Invalid input") // TODO error state
+                    }
                 }
             )
         }
         composable(
-            route = "password?networkName={networkName}&networkIcon={networkIcon}&login={login}",
-            arguments = listOf(
-                navArgument("networkName") {
-                    nullable = false
-                    type = NavType.StringType
-                },
-                navArgument("networkIcon") {
-                    nullable = false
-                    type = NavType.IntType
-                },
-                navArgument("login") {
-                    nullable = false
-                    type = NavType.StringType
-                }
+            route = AuthRoute.PASSWORD.route,
+            arguments = AuthRoute.PASSWORD.args
+        ) {
+            val model = viewModel<AuthViewModel>(
+                remember { navController.getBackStackEntry(AuthRoute.LOGIN.route) }
             )
-        ) { backStack ->
-            val networkName = backStack.arguments!!.getString("networkName")!!
-            val networkIcon = backStack.arguments!!.getInt("networkIcon")
-            val login = backStack.arguments!!.getString("login")!!
-
-            val context = LocalContext.current
             PasswordScreen(
-                network = Network(networkName, networkIcon),
-                onDone = { password ->
-                    Toast.makeText(context, "$networkName|$login|$password", Toast.LENGTH_SHORT).show()
+                viewModel = model,
+                onDone = {
+                    try {
+                        model.attemptPassword()
+                        println("Success ${GlobalState.reducer.getSessions().last().run {"$sessionId $sessionName"}}")
+                    } catch (e: AuthViewModel.MalformedInputException) {
+                        println("Malformed input") // TODO error state
+                    } catch (e: NetworkAuth.Password.WrongCredentialsException) {
+                        println("Wrong credentials") // TODO wrong credentials
+                    } catch (e: ConnectionException) {
+                        println("Connection error") // TODO connection error
+                    } catch (e: TwoFaException) {
+                        println("2FA required ${e.codeSource.name}") // TODO 2FA
+                    } catch (e: CaptchaException) {
+                        println("Captcha ${e.url}") // TODO wrong credentials
+                    } catch (e: UnsupportedLoginMethodException) {
+                        println("Login method is unsupported") // TODO unsupported login method
+                    }
                 }
             )
         }
@@ -128,7 +123,8 @@ fun LoginScreenPreview(@PreviewParameter(NetworkPreviewParameterProvider::class)
     AppTheme {
         Surface {
             LoginScreen(
-                network = network,
+                viewModel = viewModel<AuthViewModel>()
+                    .also { it.network = network },
                 onDone = {}
             )
         }
@@ -136,28 +132,35 @@ fun LoginScreenPreview(@PreviewParameter(NetworkPreviewParameterProvider::class)
 }
 
 @Composable
-fun LoginScreen(network: Network, onDone: (String) -> Unit) {
+fun LoginScreen(viewModel: AuthViewModel, onDone: (String) -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        AuthPanel(network, "Логин", "Далее", onDone)
+        AuthPanel(viewModel.network, "Логин", "Далее", viewModel.login, onDone)
     }
 }
 
 @Composable
-fun PasswordScreen(network: Network, onDone: (String) -> Unit) {
+fun PasswordScreen(viewModel: AuthViewModel, onDone: (String) -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        AuthPanel(network, "Пароль", "Войти", onDone)
+        AuthPanel(viewModel.network, "Пароль", "Войти", viewModel.password, onDone)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AuthPanel(network: Network, hint: String, buttonText: String, onDone: (String) -> Unit) {
+fun AuthPanel(
+    network: Network,
+    hint: String,
+    buttonText: String,
+    inputTextState: MutableState<String>,
+    onDone: (String) -> Unit
+) {
+    var inputText by remember { inputTextState }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -196,10 +199,9 @@ fun AuthPanel(network: Network, hint: String, buttonText: String, onDone: (Strin
             }
         }
         Spacer(modifier = Modifier.height(32.dp))
-        var text by remember { mutableStateOf("") }
         TextField(
-            value = text,
-            onValueChange = { text = it },
+            value = inputText,
+            onValueChange = { inputText = it },
             colors = TextFieldDefaults.textFieldColors(
                 textColor = MaterialTheme.colorScheme.primary,
                 containerColor = MaterialTheme.colorScheme.background,
@@ -208,7 +210,7 @@ fun AuthPanel(network: Network, hint: String, buttonText: String, onDone: (Strin
             placeholder = { Text(text = hint, color = MaterialTheme.colorScheme.onSurface) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            keyboardActions = KeyboardActions(onDone = { onDone(text) })
+            keyboardActions = KeyboardActions(onDone = { onDone(inputText) })
         )
         /*BasicTextField(
             value = text,
@@ -222,7 +224,7 @@ fun AuthPanel(network: Network, hint: String, buttonText: String, onDone: (Strin
         Spacer(modifier = Modifier.height(32.dp))
         Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { onDone(text) }
+            onClick = { onDone(inputText) }
         ) {
             Text(buttonText)
         }
@@ -230,5 +232,18 @@ fun AuthPanel(network: Network, hint: String, buttonText: String, onDone: (Strin
 }
 
 class NetworkPreviewParameterProvider: PreviewParameterProvider<Network> {
-    override val values = sequenceOf(Network("ВКонтакте", R.drawable.vk))
+    override val values = sequenceOf(Network("ВКонтакте", 0, R.drawable.vk))
+}
+
+private enum class AuthRoute(val route: String, val args: List<NamedNavArgument>) {
+    LOGIN(
+        "login?networkId={networkId}",
+        listOf(
+            navArgument("networkId") {
+                nullable = false
+                type = NavType.IntType
+            }
+        )
+    ),
+    PASSWORD("password", listOf())
 }

@@ -38,12 +38,24 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
+    packaging {
+        resources.excludes.add("META-INF/INDEX.LIST")
+        resources.excludes.add("META-INF/DEPENDENCIES")
+        resources.excludes.add("META-INF/io.netty.versions.properties")
+    }
 }
 
 dependencies {
+    implementation(project(":api"))
+
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
+
     implementation("androidx.core:core-ktx:1.8.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
 
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("androidx.navigation:navigation-compose:2.7.3")
 
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")

@@ -83,8 +83,9 @@ fun NetworksScreen(
 
 class NetworksPreviewParameterProvider: PreviewParameterProvider<List<Network>> {
     override val values: Sequence<List<Network>> = sequenceOf(listOf(
-        Network("ВКонтакте", R.drawable.vk),
-        Network("Telegram", R.drawable.telegram)
+        Network("ВКонтакте", 0, R.drawable.vk),
+        Network("Telegram", 0, R.drawable.telegram),
+        Network("Debug", 0, 0)
     ))
 
     override val count: Int
@@ -93,5 +94,6 @@ class NetworksPreviewParameterProvider: PreviewParameterProvider<List<Network>> 
 
 data class Network(
     val name: String,
+    val id: Int,
     @DrawableRes val icon: Int
 )
