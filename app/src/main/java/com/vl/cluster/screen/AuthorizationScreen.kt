@@ -48,6 +48,11 @@ import androidx.navigation.compose.navigation
 import com.vl.cluster.GlobalState
 import com.vl.cluster.GlobalState.getIcon
 import com.vl.cluster.R
+import com.vl.cluster.api.definition.exception.CaptchaException
+import com.vl.cluster.api.definition.exception.ConnectionException
+import com.vl.cluster.api.definition.exception.TwoFaException
+import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException
+import com.vl.cluster.api.definition.features.NetworkAuth
 import com.vl.cluster.logic.AuthViewModel
 import com.vl.cluster.ui.theme.AppTheme
 
@@ -71,7 +76,14 @@ fun NavGraphBuilder.authorizationNavigation(
                 }
             LoginScreen(
                 viewModel = model,
-                onDone = { navController.navigate("password") }
+                onDone = {
+                    try {
+                        model.attemptLogin()
+                        navController.navigate(AuthRoute.PASSWORD.route) // TODO choose relevant sign method
+                    } catch (e: AuthViewModel.MalformedInputException) {
+                        println("Invalid input") // TODO error state
+                    }
+                }
             )
         }
         composable(
@@ -81,7 +93,27 @@ fun NavGraphBuilder.authorizationNavigation(
             val model = viewModel<AuthViewModel>(
                 remember { navController.getBackStackEntry(AuthRoute.LOGIN.route) }
             )
-            PasswordScreen(viewModel = model, onDone = { model.signIn() })
+            PasswordScreen(
+                viewModel = model,
+                onDone = {
+                    try {
+                        model.attemptPassword()
+                        println("Success ${GlobalState.reducer.getSessions().last().run {"$sessionId $sessionName"}}")
+                    } catch (e: AuthViewModel.MalformedInputException) {
+                        println("Malformed input") // TODO error state
+                    } catch (e: NetworkAuth.Password.WrongCredentialsException) {
+                        println("Wrong credentials") // TODO wrong credentials
+                    } catch (e: ConnectionException) {
+                        println("Connection error") // TODO connection error
+                    } catch (e: TwoFaException) {
+                        println("2FA required ${e.codeSource.name}") // TODO 2FA
+                    } catch (e: CaptchaException) {
+                        println("Captcha ${e.url}") // TODO wrong credentials
+                    } catch (e: UnsupportedLoginMethodException) {
+                        println("Login method is unsupported") // TODO unsupported login method
+                    }
+                }
+            )
         }
     }
 

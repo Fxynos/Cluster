@@ -8,7 +8,7 @@ class CaptchaException(
     val url: String,
     private val onConfirmed: Confirmation
 ): Exception() {
-
+    @Throws(Exception::class)
     fun confirm(captcha: String) = onConfirmed.confirm(captcha)
 
     fun interface Confirmation {

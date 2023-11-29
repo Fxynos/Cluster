@@ -2,7 +2,6 @@ package com.vl.cluster.api.network.vk;
 
 import com.google.gson.Gson;
 import com.vk.api.sdk.client.VkApiClient;
-import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vl.cluster.api.ApiCredentialsKt;
 import com.vl.cluster.api.HttpClient;
 import com.vl.cluster.api.definition.exception.CaptchaException;

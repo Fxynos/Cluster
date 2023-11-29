@@ -35,8 +35,8 @@ class NetworkReducer(val networks: Array<Network<out Session>>) {
 
     fun findNetById(id: Int): Network<out Session> = Stream.of(*networks)
         .filter { it.networkId == id }
-        .findAny().orElseThrow()
+        .findAny().get()
     fun findSessionById(id: Int): Session = Stream.of(*sessions.toTypedArray())
         .filter { it.sessionId == id }
-        .findAny().orElseThrow()
+        .findAny().get()
 }
