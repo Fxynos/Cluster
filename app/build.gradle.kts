@@ -49,6 +49,10 @@ android {
 dependencies {
     implementation(project(":api"))
 
+    /* Coil */
+    implementation("io.coil-kt:coil:2.5.0")
+    implementation("io.coil-kt:coil-compose:2.5.0") // loading images async for url right in composable
+
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
 

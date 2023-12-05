@@ -23,6 +23,13 @@ class AuthViewModel(app: Application): AndroidViewModel(app) {
     lateinit var network: Network
     val login = mutableStateOf("")
     val password = mutableStateOf("")
+    val loginVariant: NetworkAuth.LoginType? // null if there are several login types
+        get() = GlobalState.reducer.findNetById(network.id).authentication.loginVariants.let {
+            if (it.size > 1)
+                null
+            else
+                it.first()
+        }
 
     @Throws(MalformedInputException::class)
     fun attemptLogin() {
@@ -33,7 +40,7 @@ class AuthViewModel(app: Application): AndroidViewModel(app) {
                     .matches(Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$"))
 
                 NetworkAuth.LoginType.PHONE -> login.value
-                    .matches(Regex("^[+]?[(]?[0-9]{3}[)]?[-\\s.]?[0-9]{3}[-\\s.]?[0-9]{4,6}\$"))
+                    .matches(Regex("^(\\+7|8)[0-9]{10}\$"))
             }
         }
         if (!isValid)
@@ -55,5 +62,6 @@ class AuthViewModel(app: Application): AndroidViewModel(app) {
             GlobalState.reducer.signInWithPassword(network.id, login.value, password.value)
         }
     }
+
     class MalformedInputException: Exception()
 }

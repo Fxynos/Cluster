@@ -1,6 +1,7 @@
 package com.vl.cluster.screen
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -27,11 +29,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -74,14 +81,22 @@ fun NavGraphBuilder.authorizationNavigation(
                 .findNetById(backStack.arguments!!.getInt("networkId")).let {
                     Network(it.networkName, it.networkId, it.getIcon())
                 }
+            val errorState = remember { mutableStateOf(false) }
             LoginScreen(
                 viewModel = model,
+                errorState,
+                keyboardType = when (model.loginVariant) {
+                    NetworkAuth.LoginType.PHONE -> KeyboardType.Phone
+                    NetworkAuth.LoginType.EMAIL -> KeyboardType.Email
+                    else -> KeyboardType.Text
+                 },
                 onDone = {
                     try {
                         model.attemptLogin()
+                        errorState.value = false
                         navController.navigate(AuthRoute.PASSWORD.route) // TODO choose relevant sign method
                     } catch (e: AuthViewModel.MalformedInputException) {
-                        println("Invalid input") // TODO error state
+                        errorState.value = true
                     }
                 }
             )
@@ -93,24 +108,30 @@ fun NavGraphBuilder.authorizationNavigation(
             val model = viewModel<AuthViewModel>(
                 remember { navController.getBackStackEntry(AuthRoute.LOGIN.route) }
             )
+            val errorState = remember { mutableStateOf(false) }
+            val context = LocalContext.current
             PasswordScreen(
                 viewModel = model,
+                errorState = errorState,
                 onDone = {
                     try {
                         model.attemptPassword()
-                        println("Success ${GlobalState.reducer.getSessions().last().run {"$sessionId $sessionName"}}")
-                    } catch (e: AuthViewModel.MalformedInputException) {
-                        println("Malformed input") // TODO error state
-                    } catch (e: NetworkAuth.Password.WrongCredentialsException) {
-                        println("Wrong credentials") // TODO wrong credentials
-                    } catch (e: ConnectionException) {
-                        println("Connection error") // TODO connection error
-                    } catch (e: TwoFaException) {
-                        println("2FA required ${e.codeSource.name}") // TODO 2FA
-                    } catch (e: CaptchaException) {
-                        println("Captcha ${e.url}") // TODO wrong credentials
-                    } catch (e: UnsupportedLoginMethodException) {
-                        println("Login method is unsupported") // TODO unsupported login method
+                        errorState.value = false
+                        Toast.makeText(context,
+                            "Success ${
+                                GlobalState.reducer.getSessions().last().run {"$sessionId $sessionName"}
+                            }", Toast.LENGTH_LONG).show()
+                    } catch (e: Exception) {
+                        when (e) {
+                            is AuthViewModel.MalformedInputException,
+                            is NetworkAuth.Password.WrongCredentialsException ->
+                                errorState.value = true
+                            is ConnectionException -> println("Connection error") // TODO connection error
+                            is TwoFaException -> println("2FA required ${e.codeSource.name}") // TODO 2FA
+                            is CaptchaException -> println("Captcha ${e.url}") // TODO wrong credentials
+                            is UnsupportedLoginMethodException -> println("Login method is unsupported") // TODO unsupported login method
+                            else -> throw e
+                        }
                     }
                 }
             )
@@ -119,35 +140,80 @@ fun NavGraphBuilder.authorizationNavigation(
 
 @Preview
 @Composable
-fun LoginScreenPreview(@PreviewParameter(NetworkPreviewParameterProvider::class) network: Network) {
+fun AuthPanelPreview(
+    @PreviewParameter(NetworkPreviewParameterProvider::class) network: Network
+) {
     AppTheme {
         Surface {
-            LoginScreen(
-                viewModel = viewModel<AuthViewModel>()
-                    .also { it.network = network },
-                onDone = {}
-            )
+            val error = remember { mutableStateOf(false) }
+            AuthPanel(
+                network,
+                "Логин",
+                "Далее",
+                remember { mutableStateOf("") },
+                error,
+                KeyboardType.Phone
+            ) { error.value = !error.value }
         }
     }
 }
 
 @Composable
-fun LoginScreen(viewModel: AuthViewModel, onDone: (String) -> Unit) {
+fun LoginScreen(
+    viewModel: AuthViewModel,
+    errorState: MutableState<Boolean>,
+    keyboardType: KeyboardType,
+    onDone: (String) -> Unit
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        AuthPanel(viewModel.network, "Логин", "Далее", viewModel.login, onDone)
+        AuthPanel(
+            viewModel.network,
+            "Логин",
+            "Далее",
+            viewModel.login,
+            errorState,
+            keyboardType,
+            onDone
+        )
     }
 }
 
 @Composable
-fun PasswordScreen(viewModel: AuthViewModel, onDone: (String) -> Unit) {
+fun PasswordScreen(viewModel: AuthViewModel, errorState: MutableState<Boolean>, onDone: (String) -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        AuthPanel(viewModel.network, "Пароль", "Войти", viewModel.password, onDone)
+        AuthPanel(
+            viewModel.network,
+            "Пароль",
+            "Войти",
+            viewModel.password,
+            errorState,
+            KeyboardType.Password,
+            onDone
+        )
+    }
+}
+
+@Composable
+fun CodeScreen(viewModel: AuthViewModel, onDone: (String) -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        AuthPanel(
+            viewModel.network,
+            "Код из SMS",
+            "Далее",
+            remember { mutableStateOf("") }, // sms code
+            remember { mutableStateOf(false) },
+            KeyboardType.Number,
+            onDone
+        )
     }
 }
 
@@ -158,9 +224,12 @@ fun AuthPanel(
     hint: String,
     buttonText: String,
     inputTextState: MutableState<String>,
+    errorState: MutableState<Boolean>,
+    keyboardType: KeyboardType,
     onDone: (String) -> Unit
 ) {
-    var inputText by remember { inputTextState }
+    var inputText by inputTextState
+    val error by errorState
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -203,14 +272,18 @@ fun AuthPanel(
             value = inputText,
             onValueChange = { inputText = it },
             colors = TextFieldDefaults.textFieldColors(
-                textColor = MaterialTheme.colorScheme.primary,
+                textColor = MaterialTheme.colorScheme.onSurface,
                 containerColor = MaterialTheme.colorScheme.background,
                 unfocusedIndicatorColor = MaterialTheme.colorScheme.inversePrimary
             ),
-            placeholder = { Text(text = hint, color = MaterialTheme.colorScheme.onSurface) },
+            label = { Text(text = hint, color = MaterialTheme.colorScheme.primary) },
+            //placeholder = { Text(text = hint, color = MaterialTheme.colorScheme.onSurface) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            keyboardActions = KeyboardActions(onDone = { onDone(inputText) })
+            keyboardActions = KeyboardActions(onDone = { onDone(inputText) }),
+            keyboardOptions = KeyboardOptions(autoCorrect = false, keyboardType = keyboardType),
+            visualTransformation = if (keyboardType == KeyboardType.Password) PasswordVisualTransformation() else VisualTransformation.None,
+            isError = error
         )
         /*BasicTextField(
             value = text,
