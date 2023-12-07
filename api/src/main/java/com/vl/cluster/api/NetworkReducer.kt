@@ -29,9 +29,15 @@ class NetworkReducer(val networks: Array<Network<out Session>>) {
         UnsupportedLoginMethodException::class
     )
     fun signInWithPassword(nId: Int, login: String, password: String): Session =
-        (this.findNetById(nId).authentication as NetworkAuth.Password)
-            .signIn(login, password)
-            .also { sessions += it }
+        try {
+            (this.findNetById(nId).authentication as NetworkAuth.Password)
+                .signIn(login, password)
+                .also { sessions += it }
+        } catch (e: CaptchaException) {
+            throw CaptchaException(e.id, e.url) { key ->
+                e.confirm(key).also { sessions += it }
+            }
+        }
 
     fun findNetById(id: Int): Network<out Session> = Stream.of(*networks)
         .filter { it.networkId == id }

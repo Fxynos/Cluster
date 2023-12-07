@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +56,7 @@ import androidx.navigation.compose.navigation
 import com.vl.cluster.GlobalState
 import com.vl.cluster.GlobalState.getIcon
 import com.vl.cluster.R
+import com.vl.cluster.api.definition.exception.ApiCustomException
 import com.vl.cluster.api.definition.exception.CaptchaException
 import com.vl.cluster.api.definition.exception.ConnectionException
 import com.vl.cluster.api.definition.exception.TwoFaException
@@ -62,6 +64,8 @@ import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException
 import com.vl.cluster.api.definition.features.NetworkAuth
 import com.vl.cluster.logic.AuthViewModel
 import com.vl.cluster.ui.theme.AppTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
 @SuppressLint("UnrememberedGetBackStackEntry")
 fun NavGraphBuilder.authorizationNavigation(
@@ -109,7 +113,54 @@ fun NavGraphBuilder.authorizationNavigation(
                 remember { navController.getBackStackEntry(AuthRoute.LOGIN.route) }
             )
             val errorState = remember { mutableStateOf(false) }
+            var captcha: CaptchaException? by remember { mutableStateOf(null) }
+            var customException: ApiCustomException? by remember { mutableStateOf(null) }
             val context = LocalContext.current
+            fun toast(message: String) = Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            /* Popups */
+            if (customException != null)
+                AlertDialog(
+                    onDismissRequest = { customException = null },
+                    title = { Text(text = customException!!.title) },
+                    text = { Text(text = customException!!.description) },
+                    confirmButton = {
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = { customException = null }
+                        ) {
+                            Text("Закрыть")
+                        }
+                    }
+                )
+            else if (captcha != null)
+                CaptchaDialog(
+                    imageUrl = captcha!!.url,
+                    onDone = {
+                        if (it.isBlank())
+                            return@CaptchaDialog
+                        try {
+                            runBlocking(Dispatchers.IO) { // TODO refactor
+                                captcha!!.confirm(it)
+                            }
+                            toast("Success ${
+                                GlobalState.reducer.getSessions().last().run {"$sessionId $sessionName"}
+                            }")
+                        } catch (e: Exception) {
+                            when (e) {
+                                is NetworkAuth.Password.WrongCredentialsException ->
+                                    errorState.value = true
+                                is CaptchaException -> captcha = e
+                                is ConnectionException -> println("Connection error") // TODO connection error
+                                is TwoFaException -> println("2FA required ${e.codeSource.name}") // TODO 2FA
+                                is ApiCustomException -> customException = e
+                                else -> throw e
+                            }
+                        }
+                        captcha = null
+                    },
+                    onDismiss = {}
+                )
+            /* Screen */
             PasswordScreen(
                 viewModel = model,
                 errorState = errorState,
@@ -117,10 +168,9 @@ fun NavGraphBuilder.authorizationNavigation(
                     try {
                         model.attemptPassword()
                         errorState.value = false
-                        Toast.makeText(context,
-                            "Success ${
+                        toast("Success ${
                                 GlobalState.reducer.getSessions().last().run {"$sessionId $sessionName"}
-                            }", Toast.LENGTH_LONG).show()
+                            }")
                     } catch (e: Exception) {
                         when (e) {
                             is AuthViewModel.MalformedInputException,
@@ -128,8 +178,9 @@ fun NavGraphBuilder.authorizationNavigation(
                                 errorState.value = true
                             is ConnectionException -> println("Connection error") // TODO connection error
                             is TwoFaException -> println("2FA required ${e.codeSource.name}") // TODO 2FA
-                            is CaptchaException -> println("Captcha ${e.url}") // TODO wrong credentials
+                            is CaptchaException -> captcha = e
                             is UnsupportedLoginMethodException -> println("Login method is unsupported") // TODO unsupported login method
+                            is ApiCustomException -> customException = e
                             else -> throw e
                         }
                     }

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vl.cluster.api.ApiCredentialsKt;
 import com.vl.cluster.api.HttpClient;
+import com.vl.cluster.api.definition.exception.ApiCustomException;
 import com.vl.cluster.api.definition.exception.CaptchaException;
 import com.vl.cluster.api.definition.exception.ConnectionException;
 import com.vl.cluster.api.definition.Network;
@@ -90,8 +91,16 @@ public class VkNetwork implements
                                 exception.printStackTrace();
                                 throw new ConnectionException();
                             }
-                            if (!capAuth.isSuccessful()) // TODO check if password or captcha are wrong
-                                throw new Exception();
+                            if (!capAuth.isSuccessful()) try (ResponseBody capResponse = Objects.requireNonNull(capAuth.errorBody())) {
+                                final AuthErrorResponse capError = new Gson().fromJson(
+                                        capResponse.charStream(),
+                                        AuthErrorResponse.class
+                                );
+                                throw new ApiCustomException(
+                                        capError.getErrorName(),
+                                        capError.getErrorDescription()
+                                ); // TODO check if password or captcha are wrong
+                            }
                             AuthSuccessResponse capResponse =
                                     Objects.requireNonNull(capAuth.body());
                             return new VkSession(capResponse.getUserId(), capResponse.getAccessToken());
@@ -133,7 +142,10 @@ public class VkNetwork implements
                         );
                     }
                 }
-                default -> throw new RuntimeException(error.getErrorDescription());
+                default -> throw new ApiCustomException(
+                        error.getErrorName(),
+                        error.getErrorDescription()
+                );
             }
         }
         /* Success */
