@@ -1,6 +1,5 @@
 package com.vl.cluster.api.definition.exception
 
-import com.vl.cluster.api.definition.Session
 import kotlin.jvm.Throws
 
 class CaptchaException(
@@ -18,6 +17,6 @@ class CaptchaException(
          * @throws Exception if any other exception occurs. For example, if user signed in with wrong credentials
          */
         @Throws(Exception::class)
-        fun confirm(captcha: String): Session
+        fun confirm(captcha: String): Any // throwable generics are disallowed in java
     }
 }

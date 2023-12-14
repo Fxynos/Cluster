@@ -35,7 +35,7 @@ class NetworkReducer(val networks: Array<Network<out Session>>) {
                 .also { sessions += it }
         } catch (e: CaptchaException) {
             throw CaptchaException(e.id, e.url) { key ->
-                e.confirm(key).also { sessions += it }
+                e.confirm(key).also { sessions += it as Session }
             }
         }
 
