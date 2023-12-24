@@ -1,2 +1,3 @@
 /build
 /src/main/java/com/vl/cluster/api/ApiCredentials.kt
+/src/test/java/com/vl/cluster/api/network/vk/VkExampleTest.java

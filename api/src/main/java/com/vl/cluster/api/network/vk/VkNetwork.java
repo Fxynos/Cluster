@@ -12,12 +12,15 @@ import com.vl.cluster.api.definition.Session;
 import com.vl.cluster.api.definition.exception.TwoFaException;
 import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException;
 import com.vl.cluster.api.definition.features.NetworkAuth;
+import com.vl.cluster.api.definition.pojo.Post;
 import com.vl.cluster.api.network.vk.dto.AuthErrorResponse;
 import com.vl.cluster.api.network.vk.dto.AuthSuccessResponse;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -184,6 +187,12 @@ public class VkNetwork implements
         @Override
         public String getSessionName() {
             return "unknown"; // TODO implement
+        }
+
+        @NotNull
+        @Override
+        public List<Post> nextPage(int count, @Nullable String key) {
+            return null;
         }
     }
 }
