@@ -47,12 +47,25 @@ android {
 }
 
 dependencies {
-    implementation(project(":api"))
+    /* Telegram Data Library */
+    implementation(project(":libtd"))
 
     /* Coil */
     implementation("io.coil-kt:coil:2.5.0")
     implementation("io.coil-kt:coil-compose:2.5.0") // loading images async for url right in composable
 
+    /* Retrofit2 */
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    /* VK SDK */
+    implementation("com.vk.api:sdk:1.0.14")
+    
+    /* JUnit 5 */
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
+
+    /* Android */
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
 
