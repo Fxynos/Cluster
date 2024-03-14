@@ -1,3 +1,7 @@
 package com.vl.cluster.api.definition.features
 
-interface Newsfeed // TODO define
+import com.vl.cluster.api.definition.pojo.Post
+
+interface Newsfeed {
+    fun nextPage(count: Int, key: String? = null): List<Post>
+}

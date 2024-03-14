@@ -1,5 +1,8 @@
 package com.vl.cluster.api.network.vk;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.google.gson.Gson;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vl.cluster.api.ApiCredentialsKt;
@@ -12,12 +15,14 @@ import com.vl.cluster.api.definition.Session;
 import com.vl.cluster.api.definition.exception.TwoFaException;
 import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException;
 import com.vl.cluster.api.definition.features.NetworkAuth;
+import com.vl.cluster.api.definition.pojo.Post;
 import com.vl.cluster.api.network.vk.dto.AuthErrorResponse;
 import com.vl.cluster.api.network.vk.dto.AuthSuccessResponse;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -183,7 +188,13 @@ public class VkNetwork implements
         @NotNull
         @Override
         public String getSessionName() {
-            return "unknown"; // TODO implement
+            return "unknown"; // TODO [tva] implement session name
+        }
+
+        @NonNull
+        @Override
+        public List<Post> nextPage(int count, @Nullable String key) {
+            return null; // TODO [tva] implement paging newsfeed
         }
     }
 }
