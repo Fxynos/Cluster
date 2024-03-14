@@ -1,6 +1,5 @@
 package com.vl.cluster
 
-import androidx.annotation.DrawableRes
 import com.vl.cluster.api.NetworkReducer
 import com.vl.cluster.api.definition.Network
 import com.vl.cluster.api.network.vk.VkNetwork

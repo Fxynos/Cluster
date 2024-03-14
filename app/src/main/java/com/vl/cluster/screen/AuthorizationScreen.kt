@@ -62,7 +62,7 @@ import com.vl.cluster.api.definition.exception.ConnectionException
 import com.vl.cluster.api.definition.exception.TwoFaException
 import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException
 import com.vl.cluster.api.definition.features.NetworkAuth
-import com.vl.cluster.logic.AuthViewModel
+import com.vl.cluster.AuthViewModel
 import com.vl.cluster.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking

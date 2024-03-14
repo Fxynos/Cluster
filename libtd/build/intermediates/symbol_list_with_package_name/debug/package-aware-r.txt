@@ -1,0 +1,2 @@
+org.drinkless.td.libcore.telegram
+string app_name
