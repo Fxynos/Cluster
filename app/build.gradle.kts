@@ -58,6 +58,9 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
+    /* OkHTTP */
+    implementation ("com.squareup.okhttp3:okhttp:4.12.0")
+
     /* VK SDK */
     implementation("com.vk.api:sdk:1.0.14")
     

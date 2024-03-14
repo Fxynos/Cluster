@@ -20,6 +20,7 @@ import com.vl.cluster.api.network.vk.dto.AuthErrorResponse;
 import com.vl.cluster.api.network.vk.dto.AuthSuccessResponse;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
