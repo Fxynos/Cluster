@@ -7,4 +7,5 @@ interface Network {
     val networkId: Int
         get() = networkName.hashCode()
     val authentication: NetworkAuth
+    val sessionStore: SessionStore
 }

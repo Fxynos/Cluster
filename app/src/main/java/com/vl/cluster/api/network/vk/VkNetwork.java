@@ -1,5 +1,7 @@
 package com.vl.cluster.api.network.vk;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -7,6 +9,7 @@ import com.google.gson.Gson;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vl.cluster.api.ApiCredentialsKt;
 import com.vl.cluster.api.HttpClient;
+import com.vl.cluster.api.definition.SessionStore;
 import com.vl.cluster.api.definition.entity.Comment;
 import com.vl.cluster.api.definition.entity.Page;
 import com.vl.cluster.api.definition.exception.ApiCustomException;
@@ -28,7 +31,6 @@ import com.vl.cluster.api.network.vk.dto.AuthSuccessResponse;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -39,6 +41,11 @@ import retrofit2.Response;
 public class VkNetwork implements Network, NetworkAuth.Password {
     private static final String NAME = "ВКонтакте";
     private final HttpClient authClient = new HttpClient("https://oauth.vk.com");
+    private final VkSessionStore sessionStore;
+
+    public VkNetwork(Context context) {
+        sessionStore = new VkSessionStore(context, this);
+    }
 
     @NotNull
     @Override
@@ -172,12 +179,18 @@ public class VkNetwork implements Network, NetworkAuth.Password {
         return Network.DefaultImpls.getNetworkId(this);
     }
 
+    @NonNull
+    @Override
+    public SessionStore getSessionStore() {
+        return sessionStore;
+    }
+
     public class VkSession implements Session, Newsfeed, Messenger {
         private final VkApiClient client = new VkApiClient(new HttpTransportClient());
         private final int userId;
         private final String token;
 
-        private VkSession(int userId, String token) {
+        public VkSession(int userId, String token) {
             this.userId = userId;
             this.token = token;
         }
