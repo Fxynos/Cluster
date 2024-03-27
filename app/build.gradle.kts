@@ -1,18 +1,18 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.kotlin)
 }
 
 android {
     namespace = "com.vl.cluster"
-    compileSdk = 34
+    compileSdk = libs.versions.targetSdk.get().toInt()
 
     defaultConfig {
         applicationId = "com.vl.cluster"
-        minSdk = 27
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
+        versionCode = libs.versions.versionCode.get().toInt()
+        versionName = libs.versions.versionName.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -50,44 +50,41 @@ dependencies {
     /* Telegram Data Library */
     implementation(project(":libtd"))
 
-    /* Coil */
-    implementation("io.coil-kt:coil:2.5.0")
-    implementation("io.coil-kt:coil-compose:2.5.0") // loading images async for url right in composable
+    /* Coil */ // loading images async for url right in composable
+    implementation(libs.coil)
+    implementation(libs.coil.compose)
 
     /* Retrofit2 */
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-
-    /* OkHTTP */
-    implementation ("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation(libs.retrofit)
+    implementation(libs.gson.converter)
+    implementation (libs.okhttp)
 
     /* VK SDK */
-    implementation("com.vk.api:sdk:1.0.14")
+    implementation(libs.vk)
     
     /* JUnit 5 */
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
+    testImplementation(libs.junit.engine)
+    testImplementation(libs.junit.params)
 
     /* Android */
-    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
+    implementation(libs.lifecycle)
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.viewmodel.compose)
 
-    implementation("androidx.core:core-ktx:1.8.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
+    runtimeOnly(libs.coroutines)
+    implementation(libs.core)
+    implementation(libs.appcompat)
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-    implementation("androidx.navigation:navigation-compose:2.7.3")
-
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
-    implementation("androidx.activity:activity-compose:1.5.1")
-    implementation(platform("androidx.compose:compose-bom:2022.10.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.foundation:foundation:1.5.1")
-    implementation("androidx.compose.material3:material3")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2022.10.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation(libs.compose.navigation)
+    implementation(libs.compose.activity)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.material3)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.test.manifest)
 }

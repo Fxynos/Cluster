@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.application") version "8.0.1" apply false
-    id("com.android.library") version "8.0.1" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.10" apply false
-    id("org.jetbrains.kotlin.jvm") version "1.8.20" apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.android.kotlin) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
 }
