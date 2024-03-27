@@ -1,9 +1,10 @@
-package com.vl.cluster.api.definition.pojo
+package com.vl.cluster.api.definition.entity
 
 import com.vl.cluster.api.definition.Network
+import com.vl.cluster.api.definition.Session
 
-data class Post( // TODO attachments and reposts
-    override val network: Network,
+data class Post( // TODO [tva] attachments and reposts
+    override val session: Session,
     val postId: Long,
     val source: Profile,
     val owner: Profile,
@@ -19,4 +20,4 @@ data class Post( // TODO attachments and reposts
     val canDelete: Boolean,
     val canEdit: Boolean,
     val hasLike: Boolean
-): NetworkSpecificEntity
+): SessionSpecificEntity

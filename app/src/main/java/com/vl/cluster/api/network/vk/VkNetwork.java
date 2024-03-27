@@ -7,6 +7,8 @@ import com.google.gson.Gson;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vl.cluster.api.ApiCredentialsKt;
 import com.vl.cluster.api.HttpClient;
+import com.vl.cluster.api.definition.entity.Comment;
+import com.vl.cluster.api.definition.entity.Page;
 import com.vl.cluster.api.definition.exception.ApiCustomException;
 import com.vl.cluster.api.definition.exception.CaptchaException;
 import com.vl.cluster.api.definition.exception.ConnectionException;
@@ -18,8 +20,8 @@ import com.vl.cluster.api.definition.exception.WrongCredentialsException;
 import com.vl.cluster.api.definition.feature.Messenger;
 import com.vl.cluster.api.definition.feature.NetworkAuth;
 import com.vl.cluster.api.definition.feature.Newsfeed;
-import com.vl.cluster.api.definition.pojo.Post;
-import com.vl.cluster.api.definition.pojo.Profile;
+import com.vl.cluster.api.definition.entity.Post;
+import com.vl.cluster.api.definition.entity.Profile;
 import com.vl.cluster.api.network.vk.dto.AuthErrorResponse;
 import com.vl.cluster.api.network.vk.dto.AuthSuccessResponse;
 
@@ -192,7 +194,13 @@ public class VkNetwork implements Network, NetworkAuth.Password {
 
         @NonNull
         @Override
-        public List<Post> fetchNews(@Nullable Profile source, int count, @Nullable String key) {
+        public Page<String, Post> fetchNews(@Nullable Profile source, int count, @Nullable String key) {
+            return null; // TODO
+        }
+
+        @NonNull
+        @Override
+        public Page<String, Comment> fetchComments(@NonNull Post post, int count, @Nullable String key) {
             return null; // TODO
         }
     }

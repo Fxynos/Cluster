@@ -1,4 +1,4 @@
-package com.vl.cluster.api.definition.pojo
+package com.vl.cluster.api.definition.entity
 
 import com.vl.cluster.api.definition.Network
 

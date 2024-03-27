@@ -28,7 +28,10 @@ sealed interface NetworkAuth {
     }
 
     interface CodeAuth {
-        val nextRequestAvailableAt: Int
+        /**
+         * Unix time in seconds
+         */
+        val nextRequestAvailableAt: Long
 
         /**
          * @return code length
