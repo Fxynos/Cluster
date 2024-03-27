@@ -1,8 +1,10 @@
 package com.vl.cluster.api.definition
 
-import com.vl.cluster.api.definition.features.NetworkAuth
-import com.vl.cluster.api.definition.features.NetworkMetadata
+import com.vl.cluster.api.definition.feature.NetworkAuth
 
-interface Network<S: Session>: NetworkMetadata {
-    val authentication: NetworkAuth<S>
+interface Network {
+    val networkName: String
+    val networkId: Int
+        get() = networkName.hashCode()
+    val authentication: NetworkAuth
 }

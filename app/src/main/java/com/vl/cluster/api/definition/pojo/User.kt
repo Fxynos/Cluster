@@ -1,8 +1,14 @@
 package com.vl.cluster.api.definition.pojo
 
+import com.vl.cluster.api.definition.Network
+
 data class User(
-    override val networkId: Int,
+    override val network: Network,
     override val id: Long,
-    override val name: Profile.Name,
+    val firstname: String,
+    val lastname: String,
     override val imageUrl: String?
-): Profile
+): Profile {
+    override val name: String
+        get() = "$firstname $lastname"
+}

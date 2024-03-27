@@ -1,7 +1,9 @@
 package com.vl.cluster.api.definition.pojo
 
+import com.vl.cluster.api.definition.Network
+
 data class Post( // TODO attachments and reposts
-    override val networkId: Int,
+    override val network: Network,
     val postId: Long,
     val source: Profile,
     val owner: Profile,
@@ -17,4 +19,4 @@ data class Post( // TODO attachments and reposts
     val canDelete: Boolean,
     val canEdit: Boolean,
     val hasLike: Boolean
-): NetworkEntity
+): NetworkSpecificEntity
