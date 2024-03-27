@@ -7,7 +7,8 @@ import com.vl.cluster.api.definition.exception.CaptchaException
 import com.vl.cluster.api.definition.exception.ConnectionException
 import com.vl.cluster.api.definition.exception.TwoFaException
 import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException
-import com.vl.cluster.api.definition.features.NetworkAuth
+import com.vl.cluster.api.definition.exception.WrongCredentialsException
+import com.vl.cluster.api.definition.feature.NetworkAuth
 import com.vl.cluster.screen.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -44,7 +45,7 @@ class AuthViewModel(app: Application): AndroidViewModel(app) {
 
     @Throws(
         MalformedInputException::class,
-        NetworkAuth.Password.WrongCredentialsException::class,
+        WrongCredentialsException::class,
         ConnectionException::class,
         TwoFaException::class,
         CaptchaException::class,
@@ -53,7 +54,7 @@ class AuthViewModel(app: Application): AndroidViewModel(app) {
     fun attemptPassword() {
         if (password.value.isBlank())
             throw MalformedInputException()
-        runBlocking(Dispatchers.IO) { // TODO async
+        runBlocking(Dispatchers.IO) { // TODO [tva] async
             GlobalState.reducer.signInWithPassword(network.id, login.value, password.value)
         }
     }

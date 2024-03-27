@@ -1,7 +1,6 @@
 package com.vl.cluster.api.definition.exception
 
 import com.vl.cluster.api.definition.Session
-import com.vl.cluster.api.definition.features.NetworkAuth.Password.WrongCredentialsException
 
 class TwoFaException (
     val codeSource: CodeSource,
