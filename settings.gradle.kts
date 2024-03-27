@@ -44,6 +44,8 @@ dependencyResolutionManagement {
             library("junit-engine", "org.junit.jupiter", "junit-jupiter-engine").versionRef("junit")
             library("junit-params", "org.junit.jupiter", "junit-jupiter-params").versionRef("junit")
 
+            library("datastore-preferences", "androidx.datastore:datastore-preferences:1.0.0")
+
             library("lifecycle", "androidx.lifecycle", "lifecycle-runtime-ktx").versionRef("lifecycle")
             library("lifecycle-viewmodel", "androidx.lifecycle", "lifecycle-viewmodel-ktx").versionRef("lifecycle")
             library("lifecycle-viewmodel-compose", "androidx.lifecycle", "lifecycle-viewmodel-compose").versionRef("lifecycle")

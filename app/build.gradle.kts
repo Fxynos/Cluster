@@ -71,6 +71,8 @@ dependencies {
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.viewmodel.compose)
 
+    implementation(libs.datastore.preferences)
+
     runtimeOnly(libs.coroutines)
     implementation(libs.core)
     implementation(libs.appcompat)

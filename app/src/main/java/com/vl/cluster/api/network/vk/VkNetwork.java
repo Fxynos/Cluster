@@ -40,16 +40,6 @@ public class VkNetwork implements Network, NetworkAuth.Password {
     private static final String NAME = "ВКонтакте";
     private final HttpClient authClient = new HttpClient("https://oauth.vk.com");
 
-    private Session getSession(VkSession session) {
-        return new Session(
-                session.userId,
-                "" /* TODO [tva] get login */,
-                this,
-                session,
-                session
-        );
-    }
-
     @NotNull
     @Override
     public VkNetwork getAuthentication() {
@@ -149,10 +139,10 @@ public class VkNetwork implements Network, NetworkAuth.Password {
                                         throw new WrongCredentialsException();
                                     AuthSuccessResponse codeResponse =
                                             Objects.requireNonNull(codeAuth.body());
-                                    return getSession(new VkSession(
+                                    return new VkSession(
                                             codeResponse.getUserId(),
                                             codeResponse.getAccessToken()
-                                    ));
+                                    );
                                 }
                         );
                         default -> throw new UnsupportedLoginMethodException(
@@ -168,7 +158,7 @@ public class VkNetwork implements Network, NetworkAuth.Password {
         }
         /* Success */
         AuthSuccessResponse response = Objects.requireNonNull(auth.body());
-        return getSession(new VkSession(response.getUserId(), response.getAccessToken()));
+        return new VkSession(response.getUserId(), response.getAccessToken());
     }
 
     @NotNull
@@ -182,7 +172,7 @@ public class VkNetwork implements Network, NetworkAuth.Password {
         return Network.DefaultImpls.getNetworkId(this);
     }
 
-    public static class VkSession implements Newsfeed, Messenger {
+    public class VkSession implements Session, Newsfeed, Messenger {
         private final VkApiClient client = new VkApiClient(new HttpTransportClient());
         private final int userId;
         private final String token;
@@ -192,16 +182,45 @@ public class VkNetwork implements Network, NetworkAuth.Password {
             this.token = token;
         }
 
+        @Override
+        public int getSessionId() {
+            return userId;
+        }
+
+        @NonNull
+        @Override
+        public String getSessionName() {
+            return null; // TODO [tva] return login
+        }
+
+        @NonNull
+        @Override
+        public Network getNetwork() {
+            return VkNetwork.this;
+        }
+
+        @NonNull
+        @Override
+        public Newsfeed getNewsfeed() {
+            return this;
+        }
+
+        @NonNull
+        @Override
+        public Messenger getMessenger() {
+            return this;
+        }
+
         @NonNull
         @Override
         public Page<String, Post> fetchNews(@Nullable Profile source, int count, @Nullable String key) {
-            return null; // TODO
+            return null; // TODO [tva]
         }
 
         @NonNull
         @Override
         public Page<String, Comment> fetchComments(@NonNull Post post, int count, @Nullable String key) {
-            return null; // TODO
+            return null; // TODO [tva]
         }
     }
 }
