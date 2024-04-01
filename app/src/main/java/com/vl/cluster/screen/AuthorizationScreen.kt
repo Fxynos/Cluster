@@ -269,7 +269,6 @@ fun CodeScreen(viewModel: AuthViewModel, onDone: (String) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthPanel(
     network: Network,
@@ -323,9 +322,10 @@ fun AuthPanel(
         TextField(
             value = inputText,
             onValueChange = { inputText = it },
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = MaterialTheme.colorScheme.onSurface,
-                containerColor = MaterialTheme.colorScheme.background,
+            colors = TextFieldDefaults.colors(
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
                 unfocusedIndicatorColor = MaterialTheme.colorScheme.inversePrimary
             ),
             label = { Text(text = hint, color = MaterialTheme.colorScheme.primary) },
