@@ -8,11 +8,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.vl.cluster.GlobalState.getIcon
-import com.vl.cluster.screen.Network
-import com.vl.cluster.screen.NetworksScreen
-import com.vl.cluster.screen.WelcomeSliderPage
-import com.vl.cluster.screen.WelcomeSliderScreen
-import com.vl.cluster.screen.authorizationNavigation
+import com.vl.cluster.screen.auth.Network
+import com.vl.cluster.screen.auth.NetworksScreen
+import com.vl.cluster.screen.auth.WelcomeSliderPage
+import com.vl.cluster.screen.auth.WelcomeSliderScreen
+import com.vl.cluster.screen.auth.authorizationNavigation
+import com.vl.cluster.screen.menu.MenuScreen
 import com.vl.cluster.ui.theme.AppTheme
 
 class MainActivity: ComponentActivity() {
@@ -65,6 +66,7 @@ class MainActivity: ComponentActivity() {
                             navController,
                             "authorization?networkId={networkId}"
                         )
+                        composable("menu") { MenuScreen() } // TODO [tva] navigate here
                     }
                 }
             }

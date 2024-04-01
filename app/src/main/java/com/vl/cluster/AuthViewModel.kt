@@ -9,7 +9,7 @@ import com.vl.cluster.api.definition.exception.TwoFaException
 import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException
 import com.vl.cluster.api.definition.exception.WrongCredentialsException
 import com.vl.cluster.api.definition.feature.NetworkAuth
-import com.vl.cluster.screen.Network
+import com.vl.cluster.screen.auth.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlin.jvm.Throws

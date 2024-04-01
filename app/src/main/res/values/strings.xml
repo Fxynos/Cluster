@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Cluster</string>
+    <string name="newsfeed">Лента</string>
+    <string name="messenger">Сообщения</string>
 </resources>
