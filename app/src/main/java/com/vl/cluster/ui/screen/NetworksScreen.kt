@@ -1,4 +1,4 @@
-package com.vl.cluster.screen.auth
+package com.vl.cluster.ui.screen
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image

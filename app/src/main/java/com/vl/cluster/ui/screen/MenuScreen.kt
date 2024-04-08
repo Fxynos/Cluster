@@ -1,7 +1,6 @@
-package com.vl.cluster.screen.menu
+package com.vl.cluster.ui.screen
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -21,14 +20,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.vl.cluster.R
 
@@ -37,13 +32,16 @@ import com.vl.cluster.R
 fun MenuScreen() {
     val context = LocalContext.current
     val menuItems = remember { mutableStateListOf(
-        MenuItem(context.getString(R.string.newsfeed), R.drawable.ic_newsfeed, checked = true),
-        MenuItem(context.getString(R.string.messenger), R.drawable.ic_message),
+        MenuItem(MenuRoute.NEWSFEED, context.getString(R.string.newsfeed), R.drawable.ic_newsfeed, checked = true),
+        MenuItem(MenuRoute.MESSENGER, context.getString(R.string.messenger), R.drawable.ic_message),
     ) }
 
     Column {
         Box(modifier = Modifier.weight(1f)) {
-
+            when (menuItems.first(MenuItem::checked).route) {
+                MenuRoute.NEWSFEED -> NewsfeedScreen()
+                MenuRoute.MESSENGER -> Unit // TODO
+            }
         }
         BottomNavigationBar(
             items = menuItems,
@@ -68,7 +66,7 @@ fun BottomNavigationBar(
                 .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            for (item in items) NavigationMenuItem(
+            for (item in items) MenuItemComponent(
                 item = item,
                 onClick = { checkedItem -> onItemClicked(items.indexOf(checkedItem)) }
             )
@@ -77,7 +75,7 @@ fun BottomNavigationBar(
 }
 
 @Composable
-fun NavigationMenuItem(
+fun MenuItemComponent(
     item: MenuItem,
     onClick: (item: MenuItem) -> Unit
 ) {
@@ -88,7 +86,7 @@ fun NavigationMenuItem(
         modifier = Modifier.clickable(
             onClick = { onClick(item) },
             indication = null, // get rid of ripple effect
-            interactionSource = interactionSource // to override indication
+            interactionSource = interactionSource // required to override indication
         )
     ) {
         val (focusedColor, unfocusedColor) =
@@ -108,7 +106,13 @@ fun NavigationMenuItem(
 }
 
 data class MenuItem(
+    val route: MenuRoute,
     val title: String,
     @DrawableRes val icon: Int,
     val checked: Boolean = false
 )
+
+enum class MenuRoute {
+    NEWSFEED,
+    MESSENGER
+}

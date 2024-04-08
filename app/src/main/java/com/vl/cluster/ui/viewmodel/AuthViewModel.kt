@@ -1,15 +1,16 @@
-package com.vl.cluster
+package com.vl.cluster.ui.viewmodel
 
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
+import com.vl.cluster.GlobalState
 import com.vl.cluster.api.definition.exception.CaptchaException
 import com.vl.cluster.api.definition.exception.ConnectionException
 import com.vl.cluster.api.definition.exception.TwoFaException
 import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException
 import com.vl.cluster.api.definition.exception.WrongCredentialsException
 import com.vl.cluster.api.definition.feature.NetworkAuth
-import com.vl.cluster.screen.auth.Network
+import com.vl.cluster.ui.screen.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlin.jvm.Throws

@@ -1,4 +1,4 @@
-package com.vl.cluster.screen.auth
+package com.vl.cluster.ui.screen
 
 import android.annotation.SuppressLint
 import android.widget.Toast
@@ -62,9 +62,8 @@ import com.vl.cluster.api.definition.exception.ConnectionException
 import com.vl.cluster.api.definition.exception.TwoFaException
 import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException
 import com.vl.cluster.api.definition.feature.NetworkAuth
-import com.vl.cluster.AuthViewModel
+import com.vl.cluster.ui.viewmodel.AuthViewModel
 import com.vl.cluster.api.definition.exception.WrongCredentialsException
-import com.vl.cluster.screen.CaptchaDialog
 import com.vl.cluster.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
