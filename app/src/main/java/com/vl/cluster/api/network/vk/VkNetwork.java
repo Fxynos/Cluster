@@ -38,7 +38,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 
-public class VkNetwork implements Network, NetworkAuth.Password {
+public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
     private static final String NAME = "ВКонтакте";
     private final HttpClient authClient = new HttpClient("https://oauth.vk.com");
     private final VkSessionStore sessionStore;
@@ -185,7 +185,7 @@ public class VkNetwork implements Network, NetworkAuth.Password {
         return sessionStore;
     }
 
-    public class VkSession implements Session, Newsfeed, Messenger {
+    public class VkSession implements Session {
         private final VkApiClient client = new VkApiClient(new HttpTransportClient());
         private final int userId;
         private final String token;
