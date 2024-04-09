@@ -1,5 +1,7 @@
 package com.vl.cluster.api.network.vk;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -7,6 +9,9 @@ import com.google.gson.Gson;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vl.cluster.api.ApiCredentialsKt;
 import com.vl.cluster.api.HttpClient;
+import com.vl.cluster.api.definition.SessionStore;
+import com.vl.cluster.api.definition.entity.Comment;
+import com.vl.cluster.api.definition.entity.Page;
 import com.vl.cluster.api.definition.exception.ApiCustomException;
 import com.vl.cluster.api.definition.exception.CaptchaException;
 import com.vl.cluster.api.definition.exception.ConnectionException;
@@ -14,15 +19,18 @@ import com.vl.cluster.api.definition.Network;
 import com.vl.cluster.api.definition.Session;
 import com.vl.cluster.api.definition.exception.TwoFaException;
 import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException;
-import com.vl.cluster.api.definition.features.NetworkAuth;
-import com.vl.cluster.api.definition.pojo.Post;
+import com.vl.cluster.api.definition.exception.WrongCredentialsException;
+import com.vl.cluster.api.definition.feature.Messenger;
+import com.vl.cluster.api.definition.feature.NetworkAuth;
+import com.vl.cluster.api.definition.feature.Newsfeed;
+import com.vl.cluster.api.definition.entity.Post;
+import com.vl.cluster.api.definition.entity.Profile;
 import com.vl.cluster.api.network.vk.dto.AuthErrorResponse;
 import com.vl.cluster.api.network.vk.dto.AuthSuccessResponse;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -30,12 +38,14 @@ import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 
-public class VkNetwork implements
-        Network<VkNetwork.VkSession>,
-        NetworkAuth.Password<VkNetwork.VkSession>
-{
+public class VkNetwork implements Network, NetworkAuth.Password {
     private static final String NAME = "ВКонтакте";
     private final HttpClient authClient = new HttpClient("https://oauth.vk.com");
+    private final VkSessionStore sessionStore;
+
+    public VkNetwork(Context context) {
+        sessionStore = new VkSessionStore(context, this);
+    }
 
     @NotNull
     @Override
@@ -51,7 +61,7 @@ public class VkNetwork implements
 
     @NotNull
     @Override
-    public VkSession signIn(@NotNull String login, @NotNull String password) throws
+    public Session signIn(@NotNull String login, @NotNull String password) throws
             WrongCredentialsException,
             ConnectionException,
             TwoFaException,
@@ -104,7 +114,7 @@ public class VkNetwork implements
                                 throw new ApiCustomException(
                                         capError.getErrorName(),
                                         capError.getErrorDescription()
-                                ); // TODO check if password or captcha are wrong
+                                ); // TODO [tva] check if password or captcha are wrong
                             }
                             AuthSuccessResponse capResponse =
                                     Objects.requireNonNull(capAuth.body());
@@ -169,13 +179,18 @@ public class VkNetwork implements
         return Network.DefaultImpls.getNetworkId(this);
     }
 
-    public class VkSession extends Session {
+    @NonNull
+    @Override
+    public SessionStore getSessionStore() {
+        return sessionStore;
+    }
+
+    public class VkSession implements Session, Newsfeed, Messenger {
+        private final VkApiClient client = new VkApiClient(new HttpTransportClient());
         private final int userId;
         private final String token;
-        private final VkApiClient client = new VkApiClient(new HttpTransportClient());
 
-        private VkSession(int userId, String token) {
-            super(VkNetwork.this);
+        public VkSession(int userId, String token) {
             this.userId = userId;
             this.token = token;
         }
@@ -185,16 +200,40 @@ public class VkNetwork implements
             return userId;
         }
 
-        @NotNull
+        @NonNull
         @Override
         public String getSessionName() {
-            return "unknown"; // TODO [tva] implement session name
+            return null; // TODO [tva] return login
         }
 
         @NonNull
         @Override
-        public List<Post> nextPage(int count, @Nullable String key) {
-            return null; // TODO [tva] implement paging newsfeed
+        public Network getNetwork() {
+            return VkNetwork.this;
+        }
+
+        @NonNull
+        @Override
+        public Newsfeed getNewsfeed() {
+            return this;
+        }
+
+        @NonNull
+        @Override
+        public Messenger getMessenger() {
+            return this;
+        }
+
+        @NonNull
+        @Override
+        public Page<String, Post> fetchNews(@Nullable Profile source, int count, @Nullable String key) {
+            return null; // TODO [tva]
+        }
+
+        @NonNull
+        @Override
+        public Page<String, Comment> fetchComments(@NonNull Post post, int count, @Nullable String key) {
+            return null; // TODO [tva]
         }
     }
 }

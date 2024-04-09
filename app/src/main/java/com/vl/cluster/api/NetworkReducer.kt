@@ -6,10 +6,11 @@ import com.vl.cluster.api.definition.Session
 import com.vl.cluster.api.definition.exception.CaptchaException
 import com.vl.cluster.api.definition.exception.TwoFaException
 import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException
-import com.vl.cluster.api.definition.features.NetworkAuth
+import com.vl.cluster.api.definition.exception.WrongCredentialsException
+import com.vl.cluster.api.definition.feature.NetworkAuth
 import java.util.stream.Stream
 
-class NetworkReducer(val networks: Array<Network<out Session>>) {
+class NetworkReducer(vararg val networks: Network) {
     private val sessions = ArrayList<Session>()
 
     /**
@@ -17,12 +18,12 @@ class NetworkReducer(val networks: Array<Network<out Session>>) {
      * @return sessions of defined network or all sessions if *network id* is null
      */
     fun getSessions(nId: Int? = null): List<Session> = // exposes immutable list
-        nId?.let { id -> sessions.filter { session -> session.networkId == id } } ?: sessions
+        nId?.let { id -> sessions.filter { session -> session.network.networkId == id } } ?: sessions
     fun isPasswordAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.Password
     fun isSmsAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.Sms
     fun isCallAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.Call
     @Throws(
-        NetworkAuth.Password.WrongCredentialsException::class,
+        WrongCredentialsException::class,
         ConnectionException::class,
         TwoFaException::class,
         CaptchaException::class,
@@ -39,7 +40,7 @@ class NetworkReducer(val networks: Array<Network<out Session>>) {
             }
         }
 
-    fun findNetById(id: Int): Network<out Session> = Stream.of(*networks)
+    fun findNetById(id: Int): Network = Stream.of(*networks)
         .filter { it.networkId == id }
         .findAny().get()
     fun findSessionById(id: Int): Session = Stream.of(*sessions.toTypedArray())

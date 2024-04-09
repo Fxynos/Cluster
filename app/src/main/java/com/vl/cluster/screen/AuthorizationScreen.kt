@@ -61,8 +61,9 @@ import com.vl.cluster.api.definition.exception.CaptchaException
 import com.vl.cluster.api.definition.exception.ConnectionException
 import com.vl.cluster.api.definition.exception.TwoFaException
 import com.vl.cluster.api.definition.exception.UnsupportedLoginMethodException
-import com.vl.cluster.api.definition.features.NetworkAuth
+import com.vl.cluster.api.definition.feature.NetworkAuth
 import com.vl.cluster.AuthViewModel
+import com.vl.cluster.api.definition.exception.WrongCredentialsException
 import com.vl.cluster.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -147,7 +148,7 @@ fun NavGraphBuilder.authorizationNavigation(
                             }")
                         } catch (e: Exception) {
                             when (e) {
-                                is NetworkAuth.Password.WrongCredentialsException ->
+                                is WrongCredentialsException ->
                                     errorState.value = true
                                 is CaptchaException -> captcha = e
                                 is ConnectionException -> println("Connection error") // TODO connection error
@@ -174,7 +175,7 @@ fun NavGraphBuilder.authorizationNavigation(
                     } catch (e: Exception) {
                         when (e) {
                             is AuthViewModel.MalformedInputException,
-                            is NetworkAuth.Password.WrongCredentialsException ->
+                            is WrongCredentialsException ->
                                 errorState.value = true
                             is ConnectionException -> println("Connection error") // TODO connection error
                             is TwoFaException -> println("2FA required ${e.codeSource.name}") // TODO 2FA
@@ -268,7 +269,6 @@ fun CodeScreen(viewModel: AuthViewModel, onDone: (String) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthPanel(
     network: Network,
@@ -322,9 +322,10 @@ fun AuthPanel(
         TextField(
             value = inputText,
             onValueChange = { inputText = it },
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = MaterialTheme.colorScheme.onSurface,
-                containerColor = MaterialTheme.colorScheme.background,
+            colors = TextFieldDefaults.colors(
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
                 unfocusedIndicatorColor = MaterialTheme.colorScheme.inversePrimary
             ),
             label = { Text(text = hint, color = MaterialTheme.colorScheme.primary) },
