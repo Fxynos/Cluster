@@ -1,4 +1,4 @@
-package com.vl.cluster.screen
+package com.vl.cluster.ui.screen
 
 import android.widget.Toast
 import androidx.compose.foundation.background

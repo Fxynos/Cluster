@@ -1,4 +1,4 @@
-package com.vl.cluster.screen
+package com.vl.cluster.ui.screen
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -7,9 +7,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -24,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +35,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vl.cluster.R
+import com.vl.cluster.ui.component.DotTab
 import com.vl.cluster.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
@@ -98,24 +100,10 @@ fun WelcomeSliderScreen(
                 .wrapContentSize(align = Alignment.BottomCenter),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier.padding(bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                repeat(pages.size) { i ->
-                    val isCurrent = i == pagerState.currentPage
-                    Box(
-                        modifier = Modifier
-                            .size(if (isCurrent) 20.dp else 12.dp)
-                            .padding(4.dp)
-                            .background(
-                                color = if (isCurrent) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.secondary,
-                                shape = RoundedCornerShape(100)
-                            ),
-                    ) {}
-                }
-            }
             val isLast = pagerState.currentPage == pages.lastIndex
+
+            DotTab(pagerState)
+            Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
                     if (isLast)
