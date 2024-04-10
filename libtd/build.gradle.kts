@@ -1,10 +1,10 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.kotlin)
 }
 
 android {
-    compileSdk = 34
+    compileSdk = libs.versions.targetSdk.get().toInt()
     namespace = "org.drinkless.td.libcore.telegram"
 
     sourceSets.getByName("main") {
@@ -12,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        minSdk = 10
+        minSdk = libs.versions.minSdk.get().toInt()
     }
 
     buildTypes {
@@ -37,5 +37,5 @@ android {
 }
 
 dependencies {
-    compileOnly("com.android.support:support-annotations:28.0.0")
+    compileOnly(libs.support.annotations)
 }
