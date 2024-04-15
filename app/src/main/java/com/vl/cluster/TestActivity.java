@@ -24,14 +24,21 @@ public class TestActivity extends ComponentActivity {
         super.onCreate(savedInstanceState);
         TelegramNetwork network = new TelegramNetwork(this);
         CompletableFuture.runAsync(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException exception) {
+                exception.printStackTrace();
+            }
             Log.d(TAG, "Requesting code...");
-            var codeInfo = network.requestCode("9996612222");
+            var codeInfo = network.requestCode("9996621262");
             Log.d(TAG, "Code: ".concat(codeInfo.toString()));
             try {
-                network.signIn("1111");
-                Log.d(TAG, "Logged");
+                Thread.sleep(1000);
+                Log.d(TAG, "Passing the code...");
+                network.signIn("22222");
+                Log.d(TAG, "Signed in");
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                Log.e(TAG, "Interrupted: ".concat(e.getMessage()));
             }
         });
     }

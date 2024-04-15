@@ -35,25 +35,24 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public final class TelegramNetwork implements Network, NetworkAuth.CodeAuth {
-    private static Client client = null;
 
+    private final static String TAG = "Telegram Network";
     private static final String NAME = "Telegram";
 
+    private static Client client = null;
     private static TdApi.AuthorizationState authorizationState = null;
 
     private static volatile boolean haveAuthorization = false;
-    private static volatile boolean needQuit = false;
+    private static volatile boolean needQuit = false; // TODO [tva] remove if redundant
     private static volatile boolean canQuit = false;
 
-    private static final String newLine = System.getProperty("line.separator");
 
     private final Context context;
 
     /* Locks */
-    private final Lock authorizationLock = new ReentrantLock();
-    private final Condition gotAuthorization = authorizationLock.newCondition();
     private final BlockingQueue<CodeInfo> codeQueue = new LinkedBlockingQueue<>();
-    private final Object authLock = new Object();
+    private final Lock authLock = new ReentrantLock();
+    private final Condition authCondition = authLock.newCondition();
 
     public TelegramNetwork(Context context) {
         this.context = context;
@@ -100,7 +99,7 @@ public final class TelegramNetwork implements Network, NetworkAuth.CodeAuth {
 
         client.send(
                 new TdApi.SetAuthenticationPhoneNumber(login, null),
-                new AuthorizationRequestHandler()
+                new AuthorizationRequestHandler("Phone")
         );
 
         try {
@@ -117,16 +116,23 @@ public final class TelegramNetwork implements Network, NetworkAuth.CodeAuth {
 
         client.send(
                 new TdApi.CheckAuthenticationCode(code),
-                new AuthorizationRequestHandler()
+                new AuthorizationRequestHandler("Auth Code")
         );
 
+        authLock.lock();
         try {
-            authLock.wait();
+            authCondition.await();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        } finally {
+            authLock.unlock();
         }
 
-        requireState(TdApi.AuthorizationStateReady.CONSTRUCTOR);
+        try {
+            requireState(TdApi.AuthorizationStateReady.CONSTRUCTOR);
+        } catch (IllegalStateException exception) {
+            throw new WrongCredentialsException();
+        }
 
         return new TelegramSession(client);
     }
@@ -142,15 +148,22 @@ public final class TelegramNetwork implements Network, NetworkAuth.CodeAuth {
                 parameters.useMessageDatabase = false; //  If set to true, the library will maintain a local cache of chats and messages.
                 parameters.deviceModel = "Android";
                 parameters.apiHash = ApiCredentialsKt.API_HASH_TG;
+                parameters.useTestDc = true;
                 parameters.apiId = ApiCredentialsKt.API_ID_TG;
                 parameters.systemLanguageCode = "en";
                 parameters.useSecretChats = false;
                 parameters.applicationVersion = "1.0";
                 parameters.filesDirectory = "";
-                client.send(new TdApi.SetTdlibParameters(parameters), new AuthorizationRequestHandler());
+                client.send(
+                        new TdApi.SetTdlibParameters(parameters),
+                        new AuthorizationRequestHandler("TDLib Params")
+                );
                 break;
             case TdApi.AuthorizationStateWaitEncryptionKey.CONSTRUCTOR:
-                client.send(new TdApi.CheckDatabaseEncryptionKey(), new AuthorizationRequestHandler());
+                client.send(
+                        new TdApi.CheckDatabaseEncryptionKey(),
+                        new AuthorizationRequestHandler("Encryption Key")
+                );
             case TdApi.AuthorizationStateWaitPhoneNumber.CONSTRUCTOR: {
                 // TODO Need a phone number
                 break;
@@ -161,8 +174,6 @@ public final class TelegramNetwork implements Network, NetworkAuth.CodeAuth {
                 break;
             }
             case TdApi.AuthorizationStateWaitCode.CONSTRUCTOR: {
-                // TODO Receive AuthCode
-                Log.i("TelegramNetwork", "Requires code");
                 var codeInfo = ((TdApi.AuthorizationStateWaitCode) Objects.requireNonNull(
                         authorizationState
                 )).codeInfo;
@@ -175,22 +186,25 @@ public final class TelegramNetwork implements Network, NetworkAuth.CodeAuth {
             }
             case TdApi.AuthorizationStateWaitRegistration.CONSTRUCTOR: {
                 // TODO Waiting for First, Last name
-                client.send(new TdApi.RegisterUser("firstName", "lastName"), new AuthorizationRequestHandler());
+                client.send(
+                        new TdApi.RegisterUser("firstName", "lastName"),
+                        new AuthorizationRequestHandler("Name")
+                );
                 break;
             }
             case TdApi.AuthorizationStateWaitPassword.CONSTRUCTOR: {
                 // TODO Waiting for password
-                client.send(new TdApi.CheckAuthenticationPassword("password"), new AuthorizationRequestHandler());
+                client.send(
+                        new TdApi.CheckAuthenticationPassword("password"),
+                        new AuthorizationRequestHandler("Password")
+                );
                 break;
             }
             case TdApi.AuthorizationStateReady.CONSTRUCTOR:
                 haveAuthorization = true;
-                authorizationLock.lock();
-                try {
-                    gotAuthorization.signal();
-                } finally {
-                    authorizationLock.unlock();
-                }
+                authLock.lock();
+                authCondition.signal();
+                authLock.unlock();
                 break;
             case TdApi.AuthorizationStateLoggingOut.CONSTRUCTOR:
                 haveAuthorization = false;
@@ -252,16 +266,29 @@ public final class TelegramNetwork implements Network, NetworkAuth.CodeAuth {
         };
     }
 
-    private static class AuthorizationRequestHandler implements Client.ResultHandler {
+    private class AuthorizationRequestHandler implements Client.ResultHandler {
+
+        private final String tag;
+
+        public AuthorizationRequestHandler(String tag) {
+            this.tag = tag;
+        }
 
         @Override
         public void onResult(TdApi.Object object) {
             switch (object.getConstructor()) {
                 case TdApi.Error.CONSTRUCTOR:
-                    Log.e("TelegramNetwork", "handling error");
+                    switch (authorizationState.getConstructor()) {
+                        case TdApi.AuthorizationStateWaitCode.CONSTRUCTOR -> {
+                            authLock.lock();
+                            authCondition.signal();
+                            authLock.unlock();
+                        }
+                        default -> Log.e(TAG, tag.concat(": Failed"));
+                    }
                     break;
                 case TdApi.Ok.CONSTRUCTOR:
-                    // nothing to do.
+                    Log.d(TAG, tag.concat(": Success"));
                     break;
                 default:
                     // wrong response from TDLib error
