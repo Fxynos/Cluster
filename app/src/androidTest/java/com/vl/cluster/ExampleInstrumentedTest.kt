@@ -1,12 +1,17 @@
 package com.vl.cluster
 
+import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.vl.cluster.api.network.tg.TelegramNetwork
 
 import org.junit.Test
 import org.junit.runner.RunWith
 
 import org.junit.Assert.*
+import java.io.File
+import java.io.PrintWriter
+import kotlin.math.log
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -18,7 +23,12 @@ class ExampleInstrumentedTest {
     @Test
     fun useAppContext() {
         // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.vl.cluster", appContext.packageName)
+        val session = TelegramNetwork(InstrumentationRegistry.getInstrumentation().context).signIn()
+    }
+
+    @Test
+    fun saveFileTest() {
+        val datadir = InstrumentationRegistry.getInstrumentation().context.dataDir
+        PrintWriter(File(datadir, "sucksomedick").outputStream()).use {it.println("XD?")}
     }
 }

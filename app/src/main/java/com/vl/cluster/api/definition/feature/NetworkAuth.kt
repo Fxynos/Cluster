@@ -16,7 +16,7 @@ sealed interface NetworkAuth {
 
     val loginVariants: Set<LoginType>
 
-    interface Password: NetworkAuth {
+    interface PasswordAuth: NetworkAuth {
         @Throws(
             WrongCredentialsException::class,
             ConnectionException::class,
@@ -27,16 +27,9 @@ sealed interface NetworkAuth {
         fun signIn(login: String, password: String): Session
     }
 
-    interface CodeAuth {
-        /**
-         * Unix time in seconds
-         */
-        val nextRequestAvailableAt: Long
+    interface CodeAuth: NetworkAuth {
 
-        /**
-         * @return code length
-         */
-        fun requestCode(login: String): Int
+        fun requestCode(login: String): CodeInfo
 
         @Throws(
             WrongCredentialsException::class,
@@ -47,12 +40,24 @@ sealed interface NetworkAuth {
         fun signIn(code: String): Session
     }
 
-    interface Sms: NetworkAuth, CodeAuth
-
-    interface Call: NetworkAuth, CodeAuth
-
     /**
-     * Authentication through session on trusted device
+     * @param timeout seconds before code can be resent
      */
-    interface App: NetworkAuth, CodeAuth
+    data class CodeInfo(
+        val codeLength: Int,
+        val codeLocation: CodeLocation,
+        val timeout: Int
+    ) {
+        companion object {
+            @JvmStatic
+            val CODE_LENGTH_UNDEFINED = -1
+        }
+    }
+
+    enum class CodeLocation {
+        SMS,
+        APP,
+        CALL,
+        UNDEFINED
+    }
 }

@@ -19,9 +19,9 @@ class NetworkReducer(vararg val networks: Network) {
      */
     fun getSessions(nId: Int? = null): List<Session> = // exposes immutable list
         nId?.let { id -> sessions.filter { session -> session.network.networkId == id } } ?: sessions
-    fun isPasswordAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.Password
-    fun isSmsAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.Sms
-    fun isCallAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.Call
+    //fun isPasswordAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.PasswordAuth
+    //fun isSmsAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.Sms
+    //fun isCallAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.Call
     @Throws(
         WrongCredentialsException::class,
         ConnectionException::class,
@@ -31,7 +31,7 @@ class NetworkReducer(vararg val networks: Network) {
     )
     fun signInWithPassword(nId: Int, login: String, password: String): Session =
         try {
-            (this.findNetById(nId).authentication as NetworkAuth.Password)
+            (this.findNetById(nId).authentication as NetworkAuth.PasswordAuth)
                 .signIn(login, password)
                 .also { sessions += it }
         } catch (e: CaptchaException) {

@@ -3,7 +3,7 @@ package com.vl.cluster.api.definition
 import com.vl.cluster.api.definition.feature.Messenger
 import com.vl.cluster.api.definition.feature.Newsfeed
 
-interface Session {
+interface Session: Newsfeed, Messenger {
     val sessionId: Int
     val sessionName: String
     val network: Network
