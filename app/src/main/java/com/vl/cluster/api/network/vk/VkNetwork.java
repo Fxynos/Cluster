@@ -10,8 +10,13 @@ import com.vk.api.sdk.client.VkApiClient;
 import com.vl.cluster.api.ApiCredentialsKt;
 import com.vl.cluster.api.HttpClient;
 import com.vl.cluster.api.definition.SessionStore;
+import com.vl.cluster.api.definition.entity.ChatDialog;
+import com.vl.cluster.api.definition.entity.ChatMessage;
 import com.vl.cluster.api.definition.entity.Comment;
+import com.vl.cluster.api.definition.entity.Dialog;
 import com.vl.cluster.api.definition.entity.Page;
+import com.vl.cluster.api.definition.entity.PrivateDialog;
+import com.vl.cluster.api.definition.entity.PrivateMessage;
 import com.vl.cluster.api.definition.exception.ApiCustomException;
 import com.vl.cluster.api.definition.exception.CaptchaException;
 import com.vl.cluster.api.definition.exception.ConnectionException;
@@ -195,6 +200,8 @@ public class VkNetwork implements Network, NetworkAuth.Password {
             this.token = token;
         }
 
+        /* Session */
+
         @Override
         public int getSessionId() {
             return userId;
@@ -203,7 +210,7 @@ public class VkNetwork implements Network, NetworkAuth.Password {
         @NonNull
         @Override
         public String getSessionName() {
-            return null; // TODO [tva] return login
+            return Integer.toString(userId);
         }
 
         @NonNull
@@ -224,16 +231,86 @@ public class VkNetwork implements Network, NetworkAuth.Password {
             return this;
         }
 
+        /* Messenger */
+
+        @NonNull
+        @Override
+        public Dialog getDialog(long dialogId) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Page<String, Dialog> fetchDialogs(int count, @Nullable String key) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Page<String, PrivateMessage> fetchMessages(@NonNull PrivateDialog dialog, int count, @Nullable String key) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Page<String, ChatMessage> fetchMessages(@NonNull ChatDialog dialog, int count, @Nullable String key) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public PrivateMessage sendMessage(@NonNull PrivateMessage message) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public ChatMessage sendMessage(@NonNull ChatMessage message) {
+            return null;
+        }
+
+        /* Newsfeed */
+
+        @NonNull
+        @Override
+        public Post getPost(long postId) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Comment getComment(long commentId) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Profile getProfile(long profileId) {
+            return null;
+        }
+
         @NonNull
         @Override
         public Page<String, Post> fetchNews(@Nullable Profile source, int count, @Nullable String key) {
-            return null; // TODO [tva]
+            return null;
         }
 
         @NonNull
         @Override
         public Page<String, Comment> fetchComments(@NonNull Post post, int count, @Nullable String key) {
-            return null; // TODO [tva]
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Post setLike(@NonNull Post post) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Comment leaveComment(@NonNull Comment comment) {
+            return null;
         }
     }
 }

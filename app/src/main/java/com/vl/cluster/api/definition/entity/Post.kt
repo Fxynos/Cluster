@@ -1,15 +1,16 @@
 package com.vl.cluster.api.definition.entity
 
-import com.vl.cluster.api.definition.Network
 import com.vl.cluster.api.definition.Session
+import com.vl.cluster.api.definition.entity.attachment.Attachment
 
-data class Post( // TODO [tva] attachments and reposts
+data class Post(
     override val session: Session,
     val postId: Long,
     val source: Profile,
     val owner: Profile,
     val unixSec: Long,
     val text: String,
+    val attachments: List<Attachment>,
     val viewsCount: Long,
     val likesCount: Long,
     val commentsCount: Long,

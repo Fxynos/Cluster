@@ -4,7 +4,7 @@ import com.vl.cluster.api.definition.Network
 
 data class User(
     override val network: Network,
-    override val id: Long,
+    override val profileId: Long,
     val firstname: String,
     val lastname: String,
     override val imageUrl: String?
