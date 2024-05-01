@@ -2,7 +2,7 @@ package com.vl.cluster.api.definition.exception
 
 import kotlin.jvm.Throws
 
-class CaptchaException(
+class CaptchaException( // TODO [tva] introduce custom optional or sealed interface instead of exception
     val id: String,
     val url: String,
     private val onConfirmed: Confirmation
