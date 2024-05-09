@@ -170,7 +170,11 @@ public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
         }
         /* Success */
         AuthSuccessResponse response = Objects.requireNonNull(auth.body());
-        return new VkSession(response.getUserId(), response.getAccessToken());
+        var sessions = sessionStore.getSessions();
+        var session = new VkSession(response.getUserId(), response.getAccessToken());
+        sessions.add(session);
+        sessionStore.updateSessions(sessions);
+        return session;
     }
 
     @NotNull
@@ -190,7 +194,7 @@ public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
         return sessionStore;
     }
 
-    public class VkSession implements Session {
+    public class VkSession extends Session {
         private final VkApiClient client = new VkApiClient(new HttpTransportClient());
         private final int userId;
         private final String token;

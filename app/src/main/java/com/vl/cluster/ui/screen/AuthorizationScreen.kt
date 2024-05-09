@@ -71,7 +71,8 @@ import kotlinx.coroutines.runBlocking
 @SuppressLint("UnrememberedGetBackStackEntry")
 fun NavGraphBuilder.authorizationNavigation(
     navController: NavController,
-    route: String
+    route: String,
+    onAuthenticated: () -> Unit
 ) = navigation(
         route = route,
         startDestination = AuthRoute.LOGIN.route,
@@ -169,9 +170,7 @@ fun NavGraphBuilder.authorizationNavigation(
                     try {
                         model.attemptPassword()
                         errorState.value = false
-                        toast("Success ${
-                                GlobalState.reducer.getSessions().last().run {"$sessionId $sessionName"}
-                            }")
+                        onAuthenticated()
                     } catch (e: Exception) {
                         when (e) {
                             is AuthViewModel.MalformedInputException,

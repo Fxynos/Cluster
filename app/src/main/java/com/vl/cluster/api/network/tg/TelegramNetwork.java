@@ -10,9 +10,14 @@ import com.vl.cluster.api.ApiCredentialsKt;
 import com.vl.cluster.api.definition.Network;
 import com.vl.cluster.api.definition.Session;
 import com.vl.cluster.api.definition.SessionStore;
+import com.vl.cluster.api.definition.entity.ChatDialog;
+import com.vl.cluster.api.definition.entity.ChatMessage;
 import com.vl.cluster.api.definition.entity.Comment;
+import com.vl.cluster.api.definition.entity.Dialog;
 import com.vl.cluster.api.definition.entity.Page;
 import com.vl.cluster.api.definition.entity.Post;
+import com.vl.cluster.api.definition.entity.PrivateDialog;
+import com.vl.cluster.api.definition.entity.PrivateMessage;
 import com.vl.cluster.api.definition.entity.Profile;
 import com.vl.cluster.api.definition.exception.CaptchaException;
 import com.vl.cluster.api.definition.exception.ConnectionException;
@@ -296,12 +301,23 @@ public final class TelegramNetwork implements Network, NetworkAuth.CodeAuth {
         }
     }
 
-    public class TelegramSession implements Session {
+    public class TelegramSession extends Session {
 
         private final Client client;
 
         private TelegramSession(Client client) {
             this.client = client;
+        }
+
+        @Override
+        public int getSessionId() {
+            return 0;
+        }
+
+        @NonNull
+        @Override
+        public String getSessionName() {
+            return null;
         }
 
         @NonNull
@@ -322,27 +338,82 @@ public final class TelegramNetwork implements Network, NetworkAuth.CodeAuth {
             return this;
         }
 
+        @NonNull
         @Override
-        public int getSessionId() {
-            return 0; // TODO
+        public Dialog getDialog(long dialogId) {
+            return null;
         }
 
         @NonNull
         @Override
-        public String getSessionName() {
-            return null; // TODO
+        public Page<String, Dialog> fetchDialogs(int count, @Nullable String key) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Page<String, PrivateMessage> fetchMessages(@NonNull PrivateDialog dialog, int count, @Nullable String key) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Page<String, ChatMessage> fetchMessages(@NonNull ChatDialog dialog, int count, @Nullable String key) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public PrivateMessage sendMessage(@NonNull PrivateMessage message) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public ChatMessage sendMessage(@NonNull ChatMessage message) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Post getPost(long postId) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Comment getComment(long commentId) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Profile getProfile(long profileId) {
+            return null;
         }
 
         @NonNull
         @Override
         public Page<String, Post> fetchNews(@Nullable Profile source, int count, @Nullable String key) {
-            return null; // TODO
+            return null;
         }
 
         @NonNull
         @Override
         public Page<String, Comment> fetchComments(@NonNull Post post, int count, @Nullable String key) {
-            return null; // TODO
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Post setLike(@NonNull Post post) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Comment leaveComment(@NonNull Comment comment) {
+            return null;
         }
     }
 

@@ -44,7 +44,7 @@ class VkSessionStore(private val context: Context, private val network: VkNetwor
 
     override fun getSessions(): Set<Session> = sessions.value
 
-    override fun updateSessions(sessions: Set<Session>) {
+    fun updateSessions(sessions: Set<Session>) {
         coroutineScope.launch(Dispatchers.IO) {
             dataStore.edit { prefs ->
                 prefs[sessionsKey] = sessions.map { gson.toJson(it) }.toSet()

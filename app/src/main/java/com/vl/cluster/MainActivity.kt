@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.vl.cluster.GlobalState.getIcon
+import com.vl.cluster.api.manager.AuthManager
 import com.vl.cluster.ui.screen.Network
 import com.vl.cluster.ui.screen.NetworksScreen
 import com.vl.cluster.ui.screen.WelcomeSliderPage
@@ -19,6 +20,7 @@ import com.vl.cluster.ui.theme.AppTheme
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val isAuthorized = AuthManager(GlobalState.reducer.networks.toList()).isAuthorized
         setContent {
             AppTheme {
                 Surface {
@@ -28,8 +30,8 @@ class MainActivity: ComponentActivity() {
                         navController = navController,
                         startDestination = "welcomeScreen"
                     ) {
-                        composable("welcomeScreen") {
-                            WelcomeSliderScreen(listOf( // demo
+                        composable(if (isAuthorized) "menu" else "welcomeScreen") {
+                            WelcomeSliderScreen(listOf(
                                 WelcomeSliderPage(
                                     "Быстро и удобно",
                                     "Быстрый доступ к перепискам и файлам в одном месте.",
@@ -63,10 +65,11 @@ class MainActivity: ComponentActivity() {
                             )
                         }
                         authorizationNavigation(
-                            navController,
-                            "authorization?networkId={networkId}"
+                            navController = navController,
+                            route = "authorization?networkId={networkId}",
+                            onAuthenticated = { navController.navigate("menu") }
                         )
-                        composable("menu") { MenuScreen() } // TODO [tva] navigate here
+                        composable("menu") { MenuScreen() }
                     }
                 }
             }
