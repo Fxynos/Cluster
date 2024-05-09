@@ -1,17 +1,14 @@
 package com.vl.cluster
 
-import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.vl.cluster.api.network.tg.TelegramNetwork
+import com.vl.cluster.data.network.tg.TelegramNetwork
 
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import org.junit.Assert.*
 import java.io.File
 import java.io.PrintWriter
-import kotlin.math.log
 
 /**
  * Instrumented test, which will execute on an Android device.
