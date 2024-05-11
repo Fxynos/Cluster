@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.vl.cluster.R
 import com.vl.cluster.domain.manager.AuthManager
-import com.vl.cluster.domain.manager.NetworkReducer
 import com.vl.cluster.presentation.entity.NetworkData
 import com.vl.cluster.presentation.screen.NetworksScreen
 import com.vl.cluster.presentation.screen.WelcomeSliderPage
@@ -24,7 +23,6 @@ import javax.inject.Inject
 class MainActivity: ComponentActivity() {
 
     @Inject lateinit var authManager: AuthManager
-    @Inject lateinit var reducer: NetworkReducer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +61,8 @@ class MainActivity: ComponentActivity() {
                         }
                         composable("networks") {
                             NetworksScreen(
-                                reducer.networks.map { NetworkData(it.networkName, it.networkId, it.icon) },
+                                authManager.networks
+                                    .map { NetworkData(it.networkName, it.networkId, it.icon) },
                                 onClick = { network ->
                                     navController.navigate(
                                         "authorization?networkId=${network.id}"

@@ -11,14 +11,13 @@ import com.vl.cluster.domain.exception.ApiCustomException
 import com.vl.cluster.domain.exception.CaptchaException
 import com.vl.cluster.domain.exception.ConnectionException
 import com.vl.cluster.domain.exception.WrongCredentialsException
-import com.vl.cluster.domain.manager.NetworkReducer
+import com.vl.cluster.domain.manager.AuthManager
 import com.vl.cluster.presentation.entity.NetworkData
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -28,7 +27,7 @@ import kotlinx.coroutines.launch
 class AuthViewModel @AssistedInject constructor(
     app: Application,
     @Assisted networkId: Int,
-    private val reducer: NetworkReducer
+    private val authManager: AuthManager
 ): AndroidViewModel(app) {
     companion object {
         private const val TAG = "AuthViewModel"
@@ -37,7 +36,7 @@ class AuthViewModel @AssistedInject constructor(
     private val context: Context
         get() = getApplication()
 
-    private val network = reducer.networks.first { it.networkId == networkId }
+    private val network = authManager.networks.first { it.networkId == networkId }
     private lateinit var login: String
     private lateinit var captcha: CaptchaException
 
@@ -91,7 +90,7 @@ class AuthViewModel @AssistedInject constructor(
         _uiState.update { UiState.Processing }
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                reducer.signInWithPassword(network.networkId, login, password)
+                authManager.signInWithPassword(network.networkId, login, password)
                 _uiState.update { UiState.Authenticated }
             } catch (e: Exception) {
                 e.printStackTrace()
