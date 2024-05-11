@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.kotlin)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -47,6 +49,10 @@ android {
 }
 
 dependencies {
+    /* Hilt */
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
     /* Telegram Data Library */
     implementation(project(":libtd"))
 
