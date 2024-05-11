@@ -339,13 +339,12 @@ fun AuthPanel(
             keyboardOptions = KeyboardOptions(autoCorrect = false, keyboardType = keyboardType),
             visualTransformation = if (keyboardType == KeyboardType.Password) PasswordVisualTransformation() else VisualTransformation.None,
             isError = error != null,
-            supportingText = { error?.let { Text(it, color = MaterialTheme.colorScheme.onErrorContainer) } },
-            enabled = !isProcessing
+            supportingText = { error?.let { Text(it, color = MaterialTheme.colorScheme.onErrorContainer) } }
         )
         Spacer(modifier = Modifier.height(32.dp))
         Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { onDone(inputText) },
+            onClick = { if (!isProcessing) onDone(inputText) },
             enabled = !isProcessing
         ) {
             Box(modifier = Modifier.fillMaxWidth().height(32.dp)) {

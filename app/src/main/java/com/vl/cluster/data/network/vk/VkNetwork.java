@@ -47,7 +47,14 @@ import retrofit2.Response;
 
 
 public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
-    private static final String NAME = "ВКонтакте";
+    private static final String
+            NAME = "ВКонтакте",
+            ERROR_INVALID_CLIENT = "invalid_client",
+            ERROR_NEED_CAPTCHA = "need_captcha",
+            ERROR_NEED_VALIDATION = "need_validation",
+            TFA_SMS = "2fa_sms",
+            TFA_APP = "2fa_app";
+
     private final HttpClient authClient = new HttpClient("https://oauth.vk.com");
     private final VkSessionStore sessionStore;
 
@@ -95,8 +102,8 @@ public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
                     AuthErrorResponse.class
             );
             switch (error.getErrorName()) {
-                case "invalid_client" -> throw new WrongCredentialsException();
-                case "need_captcha" -> throw new CaptchaException(
+                case ERROR_INVALID_CLIENT -> throw new WrongCredentialsException();
+                case ERROR_NEED_CAPTCHA -> throw new CaptchaException( // TODO [tva] refactor
                         error.getCaptchaSid(),
                         error.getCaptchaImg(),
                         captcha -> { // on captcha confirmation
@@ -119,20 +126,25 @@ public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
                                         capResponse.charStream(),
                                         AuthErrorResponse.class
                                 );
-                                throw new ApiCustomException(
-                                        capError.getErrorName(),
-                                        capError.getErrorDescription()
-                                ); // TODO [tva] check if password or captcha are wrong
+                                if (capError.getErrorName().equals(ERROR_INVALID_CLIENT))
+                                    throw new WrongCredentialsException();
+                                else
+                                    throw new ApiCustomException(
+                                            capError.getErrorName(),
+                                            capError.getErrorDescription() != null ?
+                                                    capError.getErrorDescription() :
+                                                    ""
+                                    );
                             }
                             AuthSuccessResponse capResponse =
                                     Objects.requireNonNull(capAuth.body());
                             return new VkSession(capResponse.getUserId(), capResponse.getAccessToken());
                         }
                     );
-                case "need_validation" -> {
+                case ERROR_NEED_VALIDATION -> {
                     switch (error.getValidationType()) {
-                        case "2fa_sms", "2fa_app" -> throw new TwoFaException(
-                                error.getValidationType().equals("2fa_sms") ?
+                        case TFA_SMS, TFA_APP -> throw new TwoFaException(
+                                error.getValidationType().equals(TFA_SMS) ?
                                         TwoFaException.CodeSource.SMS :
                                         TwoFaException.CodeSource.APP,
                                 code -> {
