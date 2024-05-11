@@ -1,6 +1,5 @@
 package com.vl.cluster.presentation.screen
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,13 +24,14 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.vl.cluster.R
+import com.vl.cluster.presentation.entity.NetworkData
 import com.vl.cluster.presentation.theme.AppTheme
 
 @Preview
 @Composable
 fun NetworksScreenPreview(
     @PreviewParameter(NetworksPreviewParameterProvider::class)
-    networks: List<Network>
+    networks: List<NetworkData>
 ) {
     AppTheme {
         Surface {
@@ -42,8 +42,8 @@ fun NetworksScreenPreview(
 
 @Composable
 fun NetworksScreen(
-    networks: List<Network>,
-    onClick: (Network) -> Unit = {}
+    networks: List<NetworkData>,
+    onClick: (NetworkData) -> Unit = {}
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -80,19 +80,13 @@ fun NetworksScreen(
     }
 }
 
-class NetworksPreviewParameterProvider: PreviewParameterProvider<List<Network>> {
-    override val values: Sequence<List<Network>> = sequenceOf(listOf(
-        Network("ВКонтакте", 0, R.drawable.vk),
-        Network("Telegram", 0, R.drawable.telegram),
-        Network("Debug", 0, 0)
+class NetworksPreviewParameterProvider: PreviewParameterProvider<List<NetworkData>> {
+    override val values: Sequence<List<NetworkData>> = sequenceOf(listOf(
+        NetworkData("ВКонтакте", 0, R.drawable.vk),
+        NetworkData("Telegram", 0, R.drawable.telegram),
+        NetworkData("Debug", 0, 0)
     ))
 
     override val count: Int
         get() = values.count()
 }
-
-data class Network(
-    val name: String,
-    val id: Int,
-    @DrawableRes val icon: Int
-)

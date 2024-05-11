@@ -10,7 +10,8 @@ import com.vl.cluster.domain.exception.WrongCredentialsException
 import com.vl.cluster.domain.boundary.NetworkAuth
 import java.util.stream.Stream
 
-class NetworkReducer(vararg val networks: Network) {
+class NetworkReducer(val networks: List<Network>) {
+
     private val sessions = ArrayList<Session>()
 
     /**
@@ -40,7 +41,7 @@ class NetworkReducer(vararg val networks: Network) {
             }
         }
 
-    fun findNetById(id: Int): Network = Stream.of(*networks)
+    fun findNetById(id: Int): Network = networks.stream()
         .filter { it.networkId == id }
         .findAny().get()
     fun findSessionById(id: Int): Session = Stream.of(*sessions.toTypedArray())

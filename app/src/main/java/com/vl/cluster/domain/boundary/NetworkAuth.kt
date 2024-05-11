@@ -1,5 +1,7 @@
 package com.vl.cluster.domain.boundary
 
+import com.vl.cluster.domain.entity.CodeLocation
+import com.vl.cluster.domain.entity.LoginType
 import com.vl.cluster.domain.exception.ConnectionException
 import com.vl.cluster.domain.exception.CaptchaException
 import com.vl.cluster.domain.exception.TwoFaException
@@ -7,11 +9,6 @@ import com.vl.cluster.domain.exception.UnsupportedLoginMethodException
 import com.vl.cluster.domain.exception.WrongCredentialsException
 
 sealed interface NetworkAuth {
-    enum class LoginType {
-        PHONE,
-        EMAIL,
-        ID
-    }
 
     val loginVariants: Set<LoginType>
 
@@ -51,12 +48,5 @@ sealed interface NetworkAuth {
             @JvmStatic
             val CODE_LENGTH_UNDEFINED = -1
         }
-    }
-
-    enum class CodeLocation {
-        SMS,
-        APP,
-        CALL,
-        UNDEFINED
     }
 }

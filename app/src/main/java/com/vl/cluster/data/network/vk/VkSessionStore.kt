@@ -36,7 +36,7 @@ class VkSessionStore(private val context: Context, private val network: VkNetwor
     private val sessions: StateFlow<Set<VkSession>> = runBlocking {
         dataStore.data.transformLatest { prefs ->
             emit(prefs[sessionsKey]?.map { s ->
-                val entity = gson.fromJson(s, SessionEntity::class.java)
+                val entity = gson.fromJson(s, SessionData::class.java)
                 network.VkSession(entity.userId, entity.token)
             }?.toSet() ?: setOf())
         }.stateIn(coroutineScope)
@@ -47,10 +47,13 @@ class VkSessionStore(private val context: Context, private val network: VkNetwor
     fun updateSessions(sessions: Set<Session>) {
         coroutineScope.launch(Dispatchers.IO) {
             dataStore.edit { prefs ->
-                prefs[sessionsKey] = sessions.map { gson.toJson(it) }.toSet()
+                prefs[sessionsKey] = sessions.map {
+                    val session = it as VkSession
+                    gson.toJson(SessionData(session.sessionId, session.accessToken))
+                }.toSet()
             }
         }
     }
 
-    private class SessionEntity(val userId: Int, val token: String)
+    private class SessionData(val userId: Int, val token: String)
 }

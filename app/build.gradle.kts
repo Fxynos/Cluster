@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.kotlin)
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.kapt)
     alias(libs.plugins.hilt)
 }
 
@@ -45,13 +45,16 @@ android {
         resources.excludes.add("META-INF/INDEX.LIST")
         resources.excludes.add("META-INF/DEPENDENCIES")
         resources.excludes.add("META-INF/io.netty.versions.properties")
+        resources.excludes.add("META-INF/gradle/incremental.annotation.processors")
     }
 }
 
 dependencies {
     /* Hilt */
     implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.compiler)
+    implementation(libs.hilt.compose)
+    kapt(libs.hilt.compiler)
 
     /* Telegram Data Library */
     implementation(project(":libtd"))

@@ -2,4 +2,14 @@
     <string name="app_name">Cluster</string>
     <string name="newsfeed">Лента</string>
     <string name="messenger">Сообщения</string>
+    <string name="error_title">Что-то пошло не так</string>
+    <string name="error_connection">Нет подключения к сети</string>
+    <string name="error_malformed_login">Некорректный логин</string>
+    <string name="error_wrong_credentials">Неверный логин или пароль</string>
+    <string name="close">Закрыть</string>
+    <string name="login">Логин</string>
+    <string name="next">Далее</string>
+    <string name="password">Пароль</string>
+    <string name="sign_in">Войти</string>
+    <string name="authentication">Вход</string>
 </resources>

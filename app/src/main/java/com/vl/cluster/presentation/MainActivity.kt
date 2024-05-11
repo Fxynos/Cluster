@@ -8,30 +8,37 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.vl.cluster.R
-import com.vl.cluster.presentation.GlobalState.getIcon
 import com.vl.cluster.domain.manager.AuthManager
-import com.vl.cluster.presentation.screen.Network
+import com.vl.cluster.domain.manager.NetworkReducer
+import com.vl.cluster.presentation.entity.NetworkData
 import com.vl.cluster.presentation.screen.NetworksScreen
 import com.vl.cluster.presentation.screen.WelcomeSliderPage
 import com.vl.cluster.presentation.screen.WelcomeSliderScreen
 import com.vl.cluster.presentation.screen.authorizationNavigation
 import com.vl.cluster.presentation.screen.MenuScreen
 import com.vl.cluster.presentation.theme.AppTheme
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity: ComponentActivity() {
+
+    @Inject lateinit var authManager: AuthManager
+    @Inject lateinit var reducer: NetworkReducer
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val isAuthorized = AuthManager(GlobalState.reducer.networks.toList()).isAuthorized
+        val isAuthorized = authManager.isAuthorized
         setContent {
-            AppTheme {
+            AppTheme(useDarkTheme = false) {
                 Surface {
                     val navController = rememberNavController()
 
                     NavHost(
                         navController = navController,
-                        startDestination = "welcomeScreen"
+                        startDestination = if (isAuthorized) "menu" else "welcomeScreen"
                     ) {
-                        composable(if (isAuthorized) "menu" else "welcomeScreen") {
+                        composable("welcomeScreen") {
                             WelcomeSliderScreen(listOf(
                                 WelcomeSliderPage(
                                     "Быстро и удобно",
@@ -56,8 +63,7 @@ class MainActivity: ComponentActivity() {
                         }
                         composable("networks") {
                             NetworksScreen(
-                                listOf(*GlobalState.reducer.networks)
-                                    .map { Network(it.networkName, it.networkId, it.getIcon()) },
+                                reducer.networks.map { NetworkData(it.networkName, it.networkId, it.icon) },
                                 onClick = { network ->
                                     navController.navigate(
                                         "authorization?networkId=${network.id}"

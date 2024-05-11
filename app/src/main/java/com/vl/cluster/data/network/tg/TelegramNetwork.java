@@ -7,13 +7,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.vl.cluster.ApiCredentialsKt;
+import com.vl.cluster.R;
 import com.vl.cluster.domain.boundary.Network;
 import com.vl.cluster.domain.boundary.Session;
 import com.vl.cluster.domain.boundary.SessionStore;
 import com.vl.cluster.domain.entity.ChatDialog;
 import com.vl.cluster.domain.entity.ChatMessage;
+import com.vl.cluster.domain.entity.CodeLocation;
 import com.vl.cluster.domain.entity.Comment;
 import com.vl.cluster.domain.entity.Dialog;
+import com.vl.cluster.domain.entity.LoginType;
 import com.vl.cluster.domain.entity.Page;
 import com.vl.cluster.domain.entity.Post;
 import com.vl.cluster.domain.entity.PrivateDialog;
@@ -30,6 +33,7 @@ import com.vl.cluster.domain.boundary.Newsfeed;
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -73,7 +77,7 @@ public final class TelegramNetwork implements Network, NetworkAuth.CodeAuth {
     @NonNull
     @Override
     public SessionStore getSessionStore() {
-        return null; // TODO
+        return () -> Set.of(); // TODO replace stub with implementation
     }
 
     @NonNull
@@ -90,7 +94,12 @@ public final class TelegramNetwork implements Network, NetworkAuth.CodeAuth {
 
     @Override
     public int getNetworkId() {
-        return Network.DefaultImpls.getNetworkId(this);
+        return getNetworkName().hashCode();
+    }
+
+    @Override
+    public int getIcon() {
+        return R.drawable.telegram;
     }
 
     /**

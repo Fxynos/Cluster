@@ -47,7 +47,6 @@ fun CaptchaDialogPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CaptchaDialog(imageUrl: String, onDone: (String) -> Unit, onDismiss: () -> Unit) {
     Dialog(onDismiss) {

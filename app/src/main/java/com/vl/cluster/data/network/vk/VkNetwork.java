@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import com.google.gson.Gson;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vl.cluster.ApiCredentialsKt;
+import com.vl.cluster.R;
 import com.vl.cluster.data.HttpClient;
 import com.vl.cluster.data.network.vk.dto.AuthErrorResponse;
 import com.vl.cluster.domain.boundary.SessionStore;
@@ -15,6 +16,7 @@ import com.vl.cluster.domain.entity.ChatDialog;
 import com.vl.cluster.domain.entity.ChatMessage;
 import com.vl.cluster.domain.entity.Comment;
 import com.vl.cluster.domain.entity.Dialog;
+import com.vl.cluster.domain.entity.LoginType;
 import com.vl.cluster.domain.entity.Page;
 import com.vl.cluster.domain.entity.PrivateDialog;
 import com.vl.cluster.domain.entity.PrivateMessage;
@@ -36,6 +38,7 @@ import com.vl.cluster.data.network.vk.dto.AuthSuccessResponse;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -170,7 +173,7 @@ public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
         }
         /* Success */
         AuthSuccessResponse response = Objects.requireNonNull(auth.body());
-        var sessions = sessionStore.getSessions();
+        var sessions = new HashSet<>(sessionStore.getSessions());
         var session = new VkSession(response.getUserId(), response.getAccessToken());
         sessions.add(session);
         sessionStore.updateSessions(sessions);
@@ -185,7 +188,12 @@ public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
 
     @Override
     public int getNetworkId() {
-        return Network.DefaultImpls.getNetworkId(this);
+        return getNetworkName().hashCode();
+    }
+
+    @Override
+    public int getIcon() {
+        return R.drawable.vk;
     }
 
     @NonNull
@@ -202,6 +210,10 @@ public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
         public VkSession(int userId, String token) {
             this.userId = userId;
             this.token = token;
+        }
+
+        public String getAccessToken() {
+            return token;
         }
 
         /* Session */
