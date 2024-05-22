@@ -1,9 +1,5 @@
 package com.vl.cluster.presentation.screen
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,8 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,17 +33,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vl.cluster.R
 import com.vl.cluster.presentation.component.ImageAttachment
-import java.util.stream.Collectors
-import java.util.stream.IntStream
+import com.vl.cluster.presentation.component.Picture
+import com.vl.cluster.presentation.entity.Post
 
 @Preview(showSystemUi = true)
 @Composable
-fun NewsfeedScreen() {
-    val loremPostum = listOf(
+fun NewsfeedScreenPreview() {
+    NewsfeedUi(listOf(
         Post(
             "Имя Фамилиевич", "28 мая 21:46",
             LoremIpsum(8).values.joinToString(" "),
-            null, R.drawable.vk
+            "https://thumbs.dreamstime.com/b/oak-tree-26681040.jpg", R.drawable.vk
         ),
         Post(
             "Хорошие мемы", "1 апреля 21:38",
@@ -55,33 +53,37 @@ fun NewsfeedScreen() {
         Post(
             "Какой-то Пользователь", "2 апреля 4:31",
             LoremIpsum(4).values.joinToString(" "),
-            null, R.drawable.vk
+            "https://buffer.com/library/content/images/2023/10/free-images.jpg", R.drawable.vk,
+            listOf(
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1I_6KKZO1P0yG0c27Qn312Lv4rxhChLHyB03pUmtDCQ&s",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw4UeEjjERyEVTOIaXIKHlj7snPZAKulH5-z1Kau1lsw&s",
+                "https://media.springernature.com/lw703/springer-static/image/art%3A10.1038%2F528452a/MediaObjects/41586_2015_Article_BF528452a_Figg_HTML.jpg",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtMBjxYzKSBNHKpa9pjiLcDdXxK_coI7_lcCqWTYMmwA&s",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_Dn-wNSTpak7z_wC7ib3OmWLSQ6gY0dJUe8yhhSMUHw&s",
+                "https://stimg.cardekho.com/images/carexteriorimages/930x620/Maruti/Jimny/6182/1686117643111/front-left-side-47.jpg?impolicy=resize&imwidth=420"
+            )
         )
-    )
-    val context = LocalContext.current
+    ))
+}
 
+@Composable
+fun NewsfeedScreen() {
+
+}
+
+@Composable
+fun NewsfeedUi(posts: List<Post>) {
     LazyColumn {
-        items(12) {
-            val post = loremPostum[it % loremPostum.size]
+        items(posts.size) {
             Spacer(modifier = Modifier.height(4.dp))
-            PostComponent(post.title, post.datetime, post.text, post.profile, post.networkIcon,
-                IntStream.range(0, it).mapToObj {
-                    BitmapFactory.decodeResource(context.resources, R.drawable.img)
-                }.collect(Collectors.toList()))
+            PostComponent(posts[it])
             Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }
 
 @Composable
-fun PostComponent(
-    title: String,
-    secondTitle: String,
-    text: String,
-    profile: Bitmap?,
-    @DrawableRes networkIcon: Int?,
-    images: List<Bitmap>
-) {
+fun PostComponent(post: Post) {
     Surface(
         shadowElevation = 2.dp,
         shape = RoundedCornerShape(12.dp),
@@ -92,41 +94,40 @@ fun PostComponent(
             .fillMaxWidth()
             .padding(all = 12.dp)) {
             Row {
-                Box(modifier = Modifier
-                    .size(64.dp)
-                    .background(
-                        MaterialTheme.colorScheme.surfaceVariant,
-                        RoundedCornerShape(16.dp)
+                Card(
+                    modifier = Modifier.size(64.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 ) {
-                    if (profile != null)
-                        Image(
+                    if (post.profileImage != null)
+                        Picture(
                             modifier = Modifier.fillMaxSize(),
-                            bitmap = profile.asImageBitmap(),
-                            contentDescription = null
+                            image = post.profileImage,
+                            contentScale = ContentScale.Crop
                         )
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text(text = post.title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(modifier = Modifier
-                            .size(24.dp)
-                            .background(
-                                MaterialTheme.colorScheme.surfaceVariant,
-                                RoundedCornerShape(8.dp)
+                        Card(
+                            modifier = Modifier.size(24.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
                             )
                         ) {
-                            if (networkIcon != null)
-                                Image(
+                            if (post.networkIcon != null)
+                                Picture(
                                     modifier = Modifier.fillMaxSize(),
-                                    painter = painterResource(networkIcon),
-                                    contentDescription = null
+                                    image = post.networkIcon
                                 )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = secondTitle, color = MaterialTheme.colorScheme.outline)
+                        Text(text = post.datetime, color = MaterialTheme.colorScheme.outline)
                     }
                 }
                 IconButton(onClick = { /*TODO*/ }) {
@@ -135,19 +136,11 @@ fun PostComponent(
             }
             /* Body */
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = text)
-            if (images.isNotEmpty()) {
+            Text(text = post.text)
+            if (post.images.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
-                ImageAttachment(images)
+                ImageAttachment(post.images)
             }
         }
     }
 }
-
-data class Post(
-    val title: String,
-    val datetime: String,
-    val text: String,
-    val profile: Bitmap?,
-    @DrawableRes val networkIcon: Int?
-)

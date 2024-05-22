@@ -1,8 +1,6 @@
 package com.vl.cluster.presentation.component
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,13 +19,12 @@ import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10) {
+fun ImageAttachment(images: List<String>, isCarousel: Boolean = images.size > 10) {
     val cornerRadius = 4.dp
     val gap = 4.dp
 
@@ -46,11 +43,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                             .aspectRatio(1f),
                         shape = RoundedCornerShape(cornerRadius)
                     ) {
-                        Image(
+                        Picture(
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop,
-                            bitmap = images[it].asImageBitmap(),
-                            contentDescription = null
+                            image = images[it]
                         )
                     }
                 }
@@ -60,11 +56,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
         }
     } else when (images.size) {
         1 -> Card(shape = RoundedCornerShape(cornerRadius)) {
-            Image(
+            Picture(
                 modifier = Modifier.fillMaxWidth(),
                 contentScale = ContentScale.FillWidth,
-                bitmap = images.first().asImageBitmap(),
-                contentDescription = null
+                image = images.first()
             )
         }
 
@@ -73,11 +68,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(cornerRadius)
             ) {
-                Image(
+                Picture(
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
-                    bitmap = images.first().asImageBitmap(),
-                    contentDescription = null
+                    image = images.first()
                 )
             }
             Spacer(modifier = Modifier.width(gap))
@@ -85,11 +79,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(cornerRadius)
             ) {
-                Image(
+                Picture(
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
-                    bitmap = images[1].asImageBitmap(),
-                    contentDescription = null
+                    image = images[1]
                 )
             }
         }
@@ -99,11 +92,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(cornerRadius)
             ) {
-                Image(
+                Picture(
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
-                    bitmap = images.first().asImageBitmap(),
-                    contentDescription = null
+                    image = images.first()
                 )
             }
             Spacer(modifier = Modifier.width(gap))
@@ -112,11 +104,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[1].asImageBitmap(),
-                        contentDescription = null
+                        image = images[1]
                     )
                 }
                 Spacer(modifier = Modifier.height(gap))
@@ -124,11 +115,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[2].asImageBitmap(),
-                        contentDescription = null
+                        image = images[2]
                     )
                 }
             }
@@ -140,11 +130,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images.first().asImageBitmap(),
-                        contentDescription = null
+                        image = images.first()
                     )
                 }
                 Spacer(modifier = Modifier.height(gap))
@@ -152,11 +141,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[2].asImageBitmap(),
-                        contentDescription = null
+                        image = images[2]
                     )
                 }
             }
@@ -166,11 +154,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[1].asImageBitmap(),
-                        contentDescription = null
+                        image = images[1]
                     )
                 }
                 Spacer(modifier = Modifier.height(gap))
@@ -178,11 +165,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[3].asImageBitmap(),
-                        contentDescription = null
+                        image = images[3]
                     )
                 }
             }
@@ -194,11 +180,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images.first().asImageBitmap(),
-                        contentDescription = null
+                        image = images.first()
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -206,11 +191,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[1].asImageBitmap(),
-                        contentDescription = null
+                        image = images[1]
                     )
                 }
             }
@@ -220,11 +204,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[2].asImageBitmap(),
-                        contentDescription = null
+                        image = images[2]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -232,11 +215,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[3].asImageBitmap(),
-                        contentDescription = null
+                        image = images[3]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -244,11 +226,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[4].asImageBitmap(),
-                        contentDescription = null
+                        image = images[4]
                     )
                 }
             }
@@ -260,11 +241,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images.first().asImageBitmap(),
-                        contentDescription = null
+                        image = images.first()
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -272,11 +252,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[1].asImageBitmap(),
-                        contentDescription = null
+                        image = images[1]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -284,11 +263,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[2].asImageBitmap(),
-                        contentDescription = null
+                        image = images[2]
                     )
                 }
             }
@@ -298,11 +276,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[3].asImageBitmap(),
-                        contentDescription = null
+                        image = images[3]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -310,11 +287,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[4].asImageBitmap(),
-                        contentDescription = null
+                        image = images[4]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -322,11 +298,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[5].asImageBitmap(),
-                        contentDescription = null
+                        image = images[5]
                     )
                 }
             }
@@ -338,11 +313,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images.first().asImageBitmap(),
-                        contentDescription = null
+                        image = images.first()
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -350,11 +324,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[1].asImageBitmap(),
-                        contentDescription = null
+                        image = images[1]
                     )
                 }
             }
@@ -364,11 +337,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[2].asImageBitmap(),
-                        contentDescription = null
+                        image = images[2]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -376,11 +348,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[3].asImageBitmap(),
-                        contentDescription = null
+                        image = images[3]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -388,11 +359,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[4].asImageBitmap(),
-                        contentDescription = null
+                        image = images[4]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -400,11 +370,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[5].asImageBitmap(),
-                        contentDescription = null
+                        image = images[5]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -412,11 +381,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[6].asImageBitmap(),
-                        contentDescription = null
+                        image = images[6]
                     )
                 }
             }
@@ -428,11 +396,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images.first().asImageBitmap(),
-                        contentDescription = null
+                        image = images.first()
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -440,11 +407,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[1].asImageBitmap(),
-                        contentDescription = null
+                        image = images[1]
                     )
                 }
             }
@@ -454,11 +420,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[2].asImageBitmap(),
-                        contentDescription = null
+                        image = images[2]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -466,11 +431,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[3].asImageBitmap(),
-                        contentDescription = null
+                        image = images[3]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -478,11 +442,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[4].asImageBitmap(),
-                        contentDescription = null
+                        image = images[4]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -490,11 +453,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[5].asImageBitmap(),
-                        contentDescription = null
+                        image = images[5]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -502,11 +464,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[6].asImageBitmap(),
-                        contentDescription = null
+                        image = images[6]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -514,11 +475,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[7].asImageBitmap(),
-                        contentDescription = null
+                        image = images[7]
                     )
                 }
             }
@@ -530,11 +490,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images.first().asImageBitmap(),
-                        contentDescription = null
+                        image = images.first()
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -542,11 +501,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[1].asImageBitmap(),
-                        contentDescription = null
+                        image = images[1]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -554,11 +512,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[2].asImageBitmap(),
-                        contentDescription = null
+                        image = images[2]
                     )
                 }
             }
@@ -568,11 +525,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[3].asImageBitmap(),
-                        contentDescription = null
+                        image = images[3]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -580,11 +536,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[4].asImageBitmap(),
-                        contentDescription = null
+                        image = images[4]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -592,11 +547,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[5].asImageBitmap(),
-                        contentDescription = null
+                        image = images[5]
                     )
                 }
             }
@@ -606,11 +560,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[6].asImageBitmap(),
-                        contentDescription = null
+                        image = images[6]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -618,11 +571,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[7].asImageBitmap(),
-                        contentDescription = null
+                        image = images[7]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -630,11 +582,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[8].asImageBitmap(),
-                        contentDescription = null
+                        image = images[8]
                     )
                 }
             }
@@ -646,11 +597,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images.first().asImageBitmap(),
-                        contentDescription = null
+                        image = images.first()
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -658,11 +608,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[1].asImageBitmap(),
-                        contentDescription = null
+                        image = images[1]
                     )
                 }
             }
@@ -672,11 +621,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[2].asImageBitmap(),
-                        contentDescription = null
+                        image = images[2]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -684,11 +632,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[3].asImageBitmap(),
-                        contentDescription = null
+                        image = images[3]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -696,11 +643,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[4].asImageBitmap(),
-                        contentDescription = null
+                        image = images[4]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -708,11 +654,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[5].asImageBitmap(),
-                        contentDescription = null
+                        image = images[5]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -720,11 +665,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[6].asImageBitmap(),
-                        contentDescription = null
+                        image = images[6]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -732,11 +676,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[7].asImageBitmap(),
-                        contentDescription = null
+                        image = images[7]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -744,11 +687,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[8].asImageBitmap(),
-                        contentDescription = null
+                        image = images[8]
                     )
                 }
                 Spacer(modifier = Modifier.width(gap))
@@ -756,11 +698,10 @@ fun ImageAttachment(images: List<Bitmap>, isCarousel: Boolean = images.size > 10
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(cornerRadius)
                 ) {
-                    Image(
+                    Picture(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        bitmap = images[9].asImageBitmap(),
-                        contentDescription = null
+                        image = images[9]
                     )
                 }
             }
