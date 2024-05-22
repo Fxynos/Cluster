@@ -2,6 +2,10 @@ package com.vl.cluster.domain.entity
 
 import com.vl.cluster.domain.boundary.Session
 
+/**
+ * @param source wall
+ * @param owner author
+ */
 data class Post(
     override val session: Session,
     val postId: Long,

@@ -11,9 +11,12 @@ lifecycle = "2.7.0"
 hilt = "2.51"
 hiltExt = "1.2.0"
 kotlin = "1.9.10"
+paging = "3.3.0"
 
 [libraries]
 support-annotations = { group = "com.android.support", name = "support-annotations", version = "28.0.0" }
+
+paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
 
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }

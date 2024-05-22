@@ -63,7 +63,10 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.coil.compose)
 
-    /* Retrofit2 */
+    /* Paging 3 */
+    implementation(libs.paging.compose)
+
+    /* Retrofit 2 */
     implementation(libs.retrofit)
     implementation(libs.gson.converter)
     implementation (libs.okhttp)
