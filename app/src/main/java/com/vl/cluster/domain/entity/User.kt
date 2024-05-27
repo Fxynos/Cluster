@@ -4,7 +4,7 @@ import com.vl.cluster.domain.boundary.Network
 
 data class User(
     override val network: Network,
-    override val profileId: Long,
+    override val profileId: String,
     val firstname: String,
     val lastname: String,
     override val imageUrl: String?

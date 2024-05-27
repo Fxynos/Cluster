@@ -309,7 +309,7 @@ public final class TelegramNetwork implements Network, NetworkAuth.CodeAuth {
         }
     }
 
-    public class TelegramSession extends Session {
+    public class TelegramSession extends Session implements Newsfeed, Messenger {
 
         private final Client client;
 

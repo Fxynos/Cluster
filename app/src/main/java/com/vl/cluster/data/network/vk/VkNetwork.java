@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.vk.api.sdk.client.VkApiClient;
+import com.vk.api.sdk.client.actors.UserActor;
 import com.vl.cluster.ApiCredentialsKt;
 import com.vl.cluster.R;
 import com.vl.cluster.data.HttpClient;
@@ -216,29 +217,33 @@ public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
 
     public class VkSession extends Session {
         private final VkApiClient client = new VkApiClient(new HttpTransportClient());
-        private final int userId;
-        private final String token;
+        private final UserActor user;
+        private final VkNewsfeed newsfeed;
 
         public VkSession(int userId, String token) {
-            this.userId = userId;
-            this.token = token;
+            user = new UserActor(userId, token);
+            newsfeed = new VkNewsfeed(this);
         }
 
-        public String getAccessToken() {
-            return token;
+        public VkApiClient getClient() {
+            return client;
+        }
+
+        public UserActor getUser() {
+            return user;
         }
 
         /* Session */
 
         @Override
         public int getSessionId() {
-            return userId;
+            return user.getId();
         }
 
         @NonNull
         @Override
         public String getSessionName() {
-            return Integer.toString(userId);
+            return user.getPhone();
         }
 
         @NonNull
@@ -250,94 +255,12 @@ public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
         @NonNull
         @Override
         public Newsfeed getNewsfeed() {
-            return this;
+            return newsfeed;
         }
 
         @NonNull
         @Override
         public Messenger getMessenger() {
-            return this;
-        }
-
-        /* Messenger */
-
-        @NonNull
-        @Override
-        public Dialog getDialog(long dialogId) {
-            return null;
-        }
-
-        @NonNull
-        @Override
-        public Page<String, Dialog> fetchDialogs(int count, @Nullable String key) {
-            return null;
-        }
-
-        @NonNull
-        @Override
-        public Page<String, PrivateMessage> fetchMessages(@NonNull PrivateDialog dialog, int count, @Nullable String key) {
-            return null;
-        }
-
-        @NonNull
-        @Override
-        public Page<String, ChatMessage> fetchMessages(@NonNull ChatDialog dialog, int count, @Nullable String key) {
-            return null;
-        }
-
-        @NonNull
-        @Override
-        public PrivateMessage sendMessage(@NonNull PrivateMessage message) {
-            return null;
-        }
-
-        @NonNull
-        @Override
-        public ChatMessage sendMessage(@NonNull ChatMessage message) {
-            return null;
-        }
-
-        /* Newsfeed */
-
-        @NonNull
-        @Override
-        public Post getPost(long postId) {
-            return null;
-        }
-
-        @NonNull
-        @Override
-        public Comment getComment(long commentId) {
-            return null;
-        }
-
-        @NonNull
-        @Override
-        public Profile getProfile(long profileId) {
-            return null;
-        }
-
-        @NonNull
-        @Override
-        public Page<String, Post> fetchNews(@Nullable Profile source, int count, @Nullable String key) {
-            return null;
-        }
-
-        @NonNull
-        @Override
-        public Page<String, Comment> fetchComments(@NonNull Post post, int count, @Nullable String key) {
-            return null;
-        }
-
-        @NonNull
-        @Override
-        public Post setLike(@NonNull Post post) {
-            return null;
-        }
-
-        @NonNull
-        @Override
-        public Comment leaveComment(@NonNull Comment comment) {
             return null;
         }
     }

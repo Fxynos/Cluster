@@ -13,7 +13,7 @@ import java.util.stream.Stream
 
 class AuthManager(val networks: List<Network>) {
 
-    private lateinit var cachedSessions: List<Session>
+    private lateinit var cachedSessions: MutableList<Session>
     
     val isAuthorized: Boolean
         get() = cachedSessions.isNotEmpty()
@@ -24,18 +24,19 @@ class AuthManager(val networks: List<Network>) {
         cachedSessions = networks
             .map(Network::sessionStore)
             .flatMap(SessionStore::getSessions)
+            .toMutableList()
     }
 
     /* Network Reducer's guts */
-
-    private val sessions = ArrayList<Session>()
 
     /**
      * @param nId network id
      * @return sessions of defined network or all sessions if *network id* is null
      */
     fun getSessions(nId: Int? = null): List<Session> = // exposes immutable list
-        nId?.let { id -> sessions.filter { session -> session.network.networkId == id } } ?: sessions
+        nId?.let { id -> cachedSessions.filter { session ->
+            session.network.networkId == id
+        } } ?: cachedSessions
 
     fun isPasswordAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.PasswordAuth
     fun isCodeAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.CodeAuth
@@ -51,17 +52,17 @@ class AuthManager(val networks: List<Network>) {
         try {
             (this.findNetById(nId).authentication as NetworkAuth.PasswordAuth)
                 .signIn(login, password)
-                .also { sessions += it }
+                .also { cachedSessions += it }
         } catch (e: CaptchaException) {
             throw CaptchaException(e.id, e.url) { key ->
-                e.confirm(key).also { sessions += it as Session }
+                e.confirm(key).also { cachedSessions += it as Session }
             }
         }
 
     fun findNetById(id: Int): Network = networks.stream()
         .filter { it.networkId == id }
         .findAny().get()
-    fun findSessionById(id: Int): Session = Stream.of(*sessions.toTypedArray())
+    fun findSessionById(id: Int): Session = Stream.of(*cachedSessions.toTypedArray())
         .filter { it.sessionId == id }
         .findAny().get()
 }

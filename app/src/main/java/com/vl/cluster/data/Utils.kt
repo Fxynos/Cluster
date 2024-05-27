@@ -21,7 +21,7 @@ fun getDatetime(context: Context, unixSec: Long): String = Calendar.getInstance(
 
     timeInMillis = unixSec * 1000
     SimpleDateFormat(when {
-        isToday() -> "H:mm"
+        isToday() -> "${context.getString(R.string.today)} H:mm"
         isYesterday() -> "${context.getString(R.string.yesterday)} H:mm"
         thisYear() -> "d MMM ${context.getString(R.string.at_o_clock)} H:mm"
         else -> "d MMM y ${context.getString(R.string.at_o_clock)} H:mm"

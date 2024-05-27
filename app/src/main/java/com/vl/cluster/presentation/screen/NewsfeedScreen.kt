@@ -73,7 +73,9 @@ fun NewsfeedScreen() {
 
     LazyColumn {
         items(pagingItems.itemCount) {
-            PostComponent(pagingItems[it])
+            Spacer(modifier = Modifier.height(4.dp))
+            PostComponent(pagingItems[it]!!)
+            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }

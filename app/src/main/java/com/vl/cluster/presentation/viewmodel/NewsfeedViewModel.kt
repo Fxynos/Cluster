@@ -14,6 +14,8 @@ import com.vl.cluster.data.network.vk.VkNetwork
 import com.vl.cluster.domain.manager.AuthManager
 import com.vl.cluster.presentation.entity.Post
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -26,7 +28,7 @@ class NewsfeedViewModel @Inject constructor(
     private val context: Context get() = getApplication()
     private val _newsfeed = Pager(PagingConfig(50)) {
         // TODO [tva] aggregate from all sessions
-        NewsfeedPagingSource(authManager.getSessions(vk.networkId).first())
+        NewsfeedPagingSource(authManager.getSessions(vk.networkId).first().newsfeed)
     }.flow.cachedIn(viewModelScope)
 
     val newsfeed = _newsfeed.map { pagingData -> pagingData.map { post ->

@@ -102,7 +102,6 @@ public class HttpTransportClient implements TransportClient {
         try (Response response = httpClient.newCall(request).execute()) {
             Map<String, String> responseHeaders = getHeaders(response.headers()).entrySet().stream().map((entry) -> Map.entry(validateHeaderName(entry.getKey()), entry.getValue()))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-            responseHeaders.forEach((key, value) -> System.out.printf("%s:%s\n", key, value));
             if (response.body() != null) {
                 String responseBody = response.body().string();
                 return new ClientResponse(response.code(), responseBody, responseHeaders);

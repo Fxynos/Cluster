@@ -49,7 +49,7 @@ class VkSessionStore(private val context: Context, private val network: VkNetwor
             dataStore.edit { prefs ->
                 prefs[sessionsKey] = sessions.map {
                     val session = it as VkSession
-                    gson.toJson(SessionData(session.sessionId, session.accessToken))
+                    gson.toJson(SessionData(session.sessionId, session.user.accessToken))
                 }.toSet()
             }
         }

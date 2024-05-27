@@ -2,7 +2,7 @@ package com.vl.cluster.domain.boundary
 
 import java.util.Objects
 
-abstract class Session: Newsfeed, Messenger {
+abstract class Session {
     abstract val sessionId: Int
     abstract val sessionName: String
     abstract val network: Network

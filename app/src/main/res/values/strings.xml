@@ -12,6 +12,7 @@
     <string name="password">Пароль</string>
     <string name="sign_in">Войти</string>
     <string name="authentication">Вход</string>
-    <string name="yesterday">Вчера</string>
+    <string name="today">сегодня</string>
+    <string name="yesterday">вчера</string>
     <string name="at_o_clock">в</string>
 </resources>
