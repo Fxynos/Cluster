@@ -11,6 +11,7 @@ import androidx.paging.map
 import com.vl.cluster.data.NewsfeedPagingSource
 import com.vl.cluster.data.getDatetime
 import com.vl.cluster.data.network.vk.VkNetwork
+import com.vl.cluster.domain.entity.Attachment
 import com.vl.cluster.domain.manager.AuthManager
 import com.vl.cluster.presentation.entity.Post
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,7 +38,8 @@ class NewsfeedViewModel @Inject constructor(
             getDatetime(context, post.unixSec),
             post.text,
             post.source.imageUrl,
-            post.session.network.icon // TODO [tva] attachments
+            post.session.network.icon,
+            post.attachments.mapNotNull { (it as? Attachment.Image)?.resourceUrl }
         )
     } }
 }

@@ -51,7 +51,7 @@ class VkNewsfeed(private val session: VkSession): Newsfeed {
                             if (post.signerId == null) sourceProfile else getProfile(post.signerId),
                             post.date.toLong(),
                             post.text,
-                            post.attachments.mapNotNull(WallpostAttachment::toDto),
+                            post.attachments.mapNotNull { getAttachment(it) },
                             post.views.count.toLong(),
                             post.likes.count.toLong(),
                             post.comments.count.toLong(),
@@ -94,7 +94,13 @@ class VkNewsfeed(private val session: VkSession): Newsfeed {
             profiles.find { it.id == id }!!.run {
                 User(session.network, id.toString(), firstNameAbl, lastNameAbl, photo)
             }
-}
 
-private fun WallpostAttachment.toDto(): Attachment? =
-    if (false) TODO("[tva] Attachments") else null
+    private fun GetResponse.getAttachment(attachment: WallpostAttachment): Attachment? =
+        attachment.photo?.run {
+            Attachment.Image(
+                session,
+                sizes.maxBy { it.width * it.height }.url.toString(),
+                getProfile(ownerId)
+            )
+        }
+}

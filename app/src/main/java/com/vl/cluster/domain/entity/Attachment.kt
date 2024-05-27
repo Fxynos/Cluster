@@ -1,9 +1,15 @@
 package com.vl.cluster.domain.entity
 
-import com.vl.cluster.domain.entity.Profile
-import com.vl.cluster.domain.entity.SessionSpecificEntity
+import com.vl.cluster.domain.boundary.Session
 
-interface Attachment: SessionSpecificEntity {
+
+sealed interface Attachment: SessionSpecificEntity {
     val resourceUrl: String
     val owner: Profile
+
+    data class Image(
+        override val session: Session,
+        override val resourceUrl: String,
+        override val owner: Profile
+    ): Attachment
 }
