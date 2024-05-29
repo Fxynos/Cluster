@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
@@ -50,7 +51,7 @@ fun NewsfeedScreenPreview() {
             NewsfeedUi(listOf(
                 Post(
                     id = "id1",
-                    title = "Какой-то Пользователь",
+                    title = "Какой-то Пользователь Какой-то Соцсети",
                     datetime = "2 апреля 4:31",
                     text = LoremIpsum(4).values.joinToString(" "),
                     profileImage = "https://buffer.com/library/content/images/2023/10/free-images.jpg", R.drawable.vk,
@@ -113,13 +114,15 @@ fun NewsfeedUi(posts: List<Post>) {
 fun PostComponent(post: Post) {
     Surface(
         shadowElevation = 2.dp,
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.padding(horizontal = 8.dp)
+        shape = RoundedCornerShape(12.dp)
     ) {
         /* Header */
         Column(modifier = Modifier
             .fillMaxWidth()
-            .padding(all = 12.dp)) {
+            .padding(
+                vertical = 12.dp,
+                horizontal = 8.dp
+            )) {
             Row {
                 Card(
                     modifier = Modifier.size(64.dp),
@@ -137,7 +140,13 @@ fun PostComponent(post: Post) {
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = post.title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text(
+                        text = post.title,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Card(
@@ -162,8 +171,10 @@ fun PostComponent(post: Post) {
                 }
             }
             /* Body */
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = post.text)
+            if (post.text.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = post.text)
+            }
             if (post.images.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 ImageAttachment(post.images)
