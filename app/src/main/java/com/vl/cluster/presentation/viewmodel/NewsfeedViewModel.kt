@@ -15,8 +15,6 @@ import com.vl.cluster.domain.entity.Attachment
 import com.vl.cluster.domain.manager.AuthManager
 import com.vl.cluster.presentation.entity.Post
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -34,12 +32,17 @@ class NewsfeedViewModel @Inject constructor(
 
     val newsfeed = _newsfeed.map { pagingData -> pagingData.map { post ->
         Post(
-            post.source.name,
-            getDatetime(context, post.unixSec),
-            post.text,
-            post.source.imageUrl,
-            post.session.network.icon,
-            post.attachments.mapNotNull { (it as? Attachment.Image)?.resourceUrl }
+            id = post.postId,
+            title = post.source.name,
+            datetime = getDatetime(context, post.unixSec),
+            text = post.text,
+            profileImage = post.source.imageUrl,
+            networkIcon = post.session.network.icon,
+            images = post.attachments.mapNotNull { (it as? Attachment.Image)?.resourceUrl },
+            likesCount = post.likesCount,
+            commentsCount = post.commentsCount,
+            repostsCount = post.repostsCount,
+            hasLike = post.hasLike
         )
     } }
 }

@@ -8,7 +8,7 @@ import com.vl.cluster.domain.boundary.Session
  */
 data class Post(
     override val session: Session,
-    val postId: Long,
+    val postId: String,
     val source: Profile,
     val owner: Profile,
     val unixSec: Long,

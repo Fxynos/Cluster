@@ -46,7 +46,7 @@ class VkNewsfeed(private val session: VkSession): Newsfeed {
 
                         Post(
                             session,
-                            post.postId.toLong(),
+                            post.postId.toString(),
                             sourceProfile,
                             if (post.signerId == null) sourceProfile else getProfile(post.signerId),
                             post.date.toLong(),

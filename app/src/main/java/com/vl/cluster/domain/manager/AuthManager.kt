@@ -9,6 +9,7 @@ import com.vl.cluster.domain.exception.ConnectionException
 import com.vl.cluster.domain.exception.TwoFaException
 import com.vl.cluster.domain.exception.UnsupportedLoginMethodException
 import com.vl.cluster.domain.exception.WrongCredentialsException
+import okhttp3.internal.toImmutableList
 import java.util.stream.Stream
 
 class AuthManager(val networks: List<Network>) {
@@ -36,7 +37,7 @@ class AuthManager(val networks: List<Network>) {
     fun getSessions(nId: Int? = null): List<Session> = // exposes immutable list
         nId?.let { id -> cachedSessions.filter { session ->
             session.network.networkId == id
-        } } ?: cachedSessions
+        } } ?: cachedSessions.toImmutableList()
 
     fun isPasswordAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.PasswordAuth
     fun isCodeAuthAvailable(nId: Int) = this.findNetById(nId).authentication is NetworkAuth.CodeAuth
