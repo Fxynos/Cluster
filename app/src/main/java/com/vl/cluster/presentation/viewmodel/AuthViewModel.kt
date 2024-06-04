@@ -61,7 +61,7 @@ class AuthViewModel @AssistedInject constructor(
 
     fun attemptLogin(login: String) {
         val state = uiState.value
-        if (state !is UiState.Authentication)
+        if (state !is UiState.Authentication && state !is UiState.Error)
             throw IllegalStateException(state.toString())
 
         val isValid = network.authentication.loginVariants.any {
@@ -80,7 +80,7 @@ class AuthViewModel @AssistedInject constructor(
 
     fun attemptPassword(password: String) {
         val state = uiState.value
-        if (state !is UiState.Authentication)
+        if (state !is UiState.Authentication && state !is UiState.Error)
             throw IllegalStateException(state.toString())
 
         if (password.isBlank()) {
