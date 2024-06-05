@@ -412,10 +412,9 @@ public final class TelegramNetwork implements Network, NetworkAuth.CodeAuth {
             return null;
         }
 
-        @NonNull
         @Override
-        public Post setLike(@NonNull Post post) {
-            return null;
+        public void setLike(@NonNull String postId, boolean hasLike) {
+            // TODO
         }
 
         @NonNull

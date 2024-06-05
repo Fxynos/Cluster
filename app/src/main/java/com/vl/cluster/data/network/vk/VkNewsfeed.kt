@@ -1,5 +1,6 @@
 package com.vl.cluster.data.network.vk
 
+import com.vk.api.sdk.objects.likes.Type
 import com.vk.api.sdk.objects.newsfeed.Filters
 import com.vk.api.sdk.objects.newsfeed.responses.GetResponse
 import com.vk.api.sdk.objects.wall.WallpostAttachment
@@ -72,8 +73,11 @@ class VkNewsfeed(private val session: VkSession): Newsfeed {
         TODO("Not yet implemented")
     }
 
-    override fun setLike(post: Post): Post {
-        TODO("Not yet implemented")
+    override fun setLike(postId: String, hasLike: Boolean) {
+        if (hasLike)
+            client.likes().add(user, Type.POST, postId.toInt())
+        else
+            client.likes().delete(user, Type.POST, postId.toInt())
     }
 
     override fun leaveComment(comment: Comment): Comment {

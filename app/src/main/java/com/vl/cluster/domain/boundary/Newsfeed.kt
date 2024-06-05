@@ -12,11 +12,7 @@ interface Newsfeed {
     fun fetchNews(source: Profile? = null, count: Int, key: String? = null): Page<String, Post>
     fun fetchComments(post: Post, count: Int, key: String? = null): Page<String, Comment>
 
-    /**
-     * If like is already set, unset it
-     * @return the post after applying setting or unsetting like on it
-     */
-    fun setLike(post: Post): Post
+    fun setLike(postId: String, hasLike: Boolean)
 
     /**
      * @return full described comment after publishing

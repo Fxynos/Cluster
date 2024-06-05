@@ -22,7 +22,7 @@ import javax.inject.Inject
 class NewsfeedViewModel @Inject constructor(
     app: Application,
     vk: VkNetwork,
-    private val authManager: AuthManager
+    authManager: AuthManager
 ): AndroidViewModel(app) {
     private val context: Context get() = getApplication()
     private val _newsfeed = Pager(PagingConfig(50)) {
