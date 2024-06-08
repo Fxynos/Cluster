@@ -143,6 +143,11 @@ public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
                         }
                     );
                 case ERROR_NEED_VALIDATION -> {
+                    if (error.getValidationType() == null)
+                        throw new ApiCustomException(
+                                error.getErrorName(),
+                                error.getErrorDescription()
+                        );
                     switch (error.getValidationType()) {
                         case TFA_SMS, TFA_APP -> throw new TwoFaException(
                                 error.getValidationType().equals(TFA_SMS) ?
