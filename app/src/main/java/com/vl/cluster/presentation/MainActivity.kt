@@ -16,6 +16,7 @@ import com.vl.cluster.presentation.screen.WelcomeSliderPage
 import com.vl.cluster.presentation.screen.WelcomeSliderScreen
 import com.vl.cluster.presentation.screen.authorizationNavigation
 import com.vl.cluster.presentation.screen.MenuScreen
+import com.vl.cluster.presentation.screen.NewsfeedScreen
 import com.vl.cluster.presentation.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -77,7 +78,7 @@ class MainActivity: ComponentActivity() {
                             route = "authorization?networkId={networkId}",
                             onAuthenticated = { navController.navigate("menu") }
                         )
-                        composable("menu") { MenuScreen() }
+                        composable("menu") { NewsfeedScreen() }
                     }
                 }
             }

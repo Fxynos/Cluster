@@ -166,9 +166,6 @@ fun PostComponent(post: Post) {
                         Text(text = post.datetime, color = MaterialTheme.colorScheme.outline)
                     }
                 }
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(painter = painterResource(R.drawable.ic_more), contentDescription = null)
-                }
             }
             /* Body */
             if (post.text.isNotEmpty()) {
@@ -218,17 +215,12 @@ fun PostButton(
             Color(0xFF, 0xDD, 0xDD) to Color.Red
         else
             MaterialTheme.colorScheme.surfaceContainerLow to MaterialTheme.colorScheme.outline
-    Button(
-        colors = ButtonColors(
-            containerColor = containerColor,
-            contentColor = contentColor,
-            disabledContainerColor = containerColor,
-            disabledContentColor = contentColor
-        ),
-        onClick = onClick
+    Row(
+        modifier = Modifier.background(containerColor, RoundedCornerShape(100))
+            .padding(8.dp)
     ) {
-        Icon(painter = painterResource(icon), contentDescription = null)
+        Icon(painter = painterResource(icon), contentDescription = null, tint = contentColor)
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text)
+        Text(text = text, color = contentColor)
     }
 }
