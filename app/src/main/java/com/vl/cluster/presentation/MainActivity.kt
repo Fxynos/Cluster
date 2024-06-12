@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.vl.cluster.R
+import com.vl.cluster.data.network.vk.VkNetwork
 import com.vl.cluster.domain.manager.AuthManager
 import com.vl.cluster.presentation.entity.NetworkData
 import com.vl.cluster.presentation.screen.NetworksScreen
@@ -62,6 +63,7 @@ class MainActivity: ComponentActivity() {
                         composable("networks") {
                             NetworksScreen(
                                 authManager.networks
+                                    .filter { it.networkId == VkNetwork.NETWORK_ID }
                                     .map { NetworkData(it.networkName, it.networkId, it.icon) },
                                 onClick = { network ->
                                     navController.navigate(

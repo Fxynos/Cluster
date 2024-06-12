@@ -48,8 +48,10 @@ import retrofit2.Response;
 
 
 public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
+    public static final String NETWORK_NAME = "ВКонтакте";
+    public final static int NETWORK_ID = NETWORK_NAME.hashCode();
+
     private static final String
-            NAME = "ВКонтакте",
             ERROR_INVALID_CLIENT = "invalid_client",
             ERROR_NEED_CAPTCHA = "need_captcha",
             ERROR_NEED_VALIDATION = "need_validation",
@@ -201,12 +203,12 @@ public class VkNetwork implements Network, NetworkAuth.PasswordAuth {
     @NotNull
     @Override
     public String getNetworkName() {
-        return NAME;
+        return NETWORK_NAME;
     }
 
     @Override
     public int getNetworkId() {
-        return getNetworkName().hashCode();
+        return NETWORK_ID;
     }
 
     @Override
